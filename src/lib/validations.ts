@@ -9,7 +9,7 @@ export const categories = [
   "other",
 ] as const;
 
-export const statuses = ["pending", "in_progress", "resolved"] as const;
+export const statuses = ["pending", "in_progress", "resolved", "rejected"] as const;
 
 export const signUpSchema = z.object({
   fullName: z.string().trim().min(2, "Enter your full name."),
@@ -26,12 +26,15 @@ export const requestSchema = z.object({
   category: z.enum(categories),
   location: z.string().trim().min(3).max(240),
   description: z.string().trim().min(10).max(2000),
+  latitude: z.number().min(-90).max(90).nullable().optional(),
+  longitude: z.number().min(-180).max(180).nullable().optional(),
 });
 
 export const statusUpdateSchema = z.object({
   requestId: z.string().uuid(),
-  status: z.enum(statuses),
+  status: z.preprocess((value) => value === "" ? null : value, z.enum(statuses).nullable().optional()),
+  note: z.string().trim().max(2000).optional(),
 });
 
 export type RequestInput = z.infer<typeof requestSchema>;
-export type Status = z.infer<typeof statusUpdateSchema>["status"];
+export type Status = (typeof statuses)[number];

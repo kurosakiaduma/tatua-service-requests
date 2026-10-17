@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { requestSchema, signUpSchema, statusUpdateSchema } from "@/lib/validations";
+import { canTransition } from "@/lib/status-rules";
 
 export async function signUp(formData: FormData) {
   const parsed = signUpSchema.safeParse(Object.fromEntries(formData));
@@ -44,6 +45,8 @@ export async function createRequest(formData: FormData) {
     category: formData.get("category"),
     location: formData.get("location"),
     description: formData.get("description"),
+    latitude: formData.get("latitude") ? Number(formData.get("latitude")) : null,
+    longitude: formData.get("longitude") ? Number(formData.get("longitude")) : null,
   });
   if (!parsed.success) redirect("/dashboard?error=Please%20check%20the%20request%20details");
 
@@ -55,7 +58,7 @@ export async function createRequest(formData: FormData) {
     }
     imagePath = `${user.id}/${crypto.randomUUID()}-${image.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
     const { error } = await supabase.storage.from("request-images").upload(imagePath, image);
-    if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+    if (error) redirect("/dashboard?error=We%20could%20not%20upload%20that%20image.%20Please%20try%20again.");
   }
 
   const { error } = await supabase.from("requests").insert({
@@ -63,7 +66,7 @@ export async function createRequest(formData: FormData) {
     ...parsed.data,
     image_path: imagePath,
   });
-  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  if (error) redirect("/dashboard?error=We%20could%20not%20save%20your%20request.%20Please%20try%20again.");
   revalidatePath("/dashboard");
   redirect("/dashboard?created=1");
 }
@@ -76,8 +79,16 @@ export async function updateRequestStatus(formData: FormData) {
   if (!user) redirect("/login");
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
   if (profile?.role !== "admin") redirect("/dashboard");
-  const { error } = await supabase.from("requests").update({ status: parsed.data.status }).eq("id", parsed.data.requestId);
-  if (error) redirect(`/admin?error=${encodeURIComponent(error.message)}`);
+  const { data: request } = await supabase.from("requests").select("status").eq("id", parsed.data.requestId).single();
+  if (!request || (parsed.data.status && !canTransition(request.status, parsed.data.status, parsed.data.note ?? ""))) {
+    redirect("/admin?error=That%20status%20change%20needs%20a%20message%20or%20is%20not%20allowed.");
+  }
+  const { error } = await supabase.rpc("post_request_update", {
+    p_request_id: parsed.data.requestId,
+    p_status: parsed.data.status ?? null,
+    p_note: parsed.data.note ?? null,
+  });
+  if (error) redirect("/admin?error=We%20could%20not%20post%20that%20update.%20Please%20try%20again.");
   revalidatePath("/admin");
   revalidatePath("/dashboard");
   redirect("/admin?updated=1");

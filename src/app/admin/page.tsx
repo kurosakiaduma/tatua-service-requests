@@ -15,6 +15,11 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
     supabase.from("requests").select("*").order("created_at", { ascending: false }),
     supabase.from("status_history").select("*").order("created_at", { ascending: false }).limit(100),
   ]);
+  const requestsWithImages = await Promise.all((requests ?? []).map(async (request) => {
+    if (!request.image_path) return { ...request, image_url: null };
+    const { data } = await supabase.storage.from("request-images").createSignedUrl(request.image_path, 3600);
+    return { ...request, image_url: data?.signedUrl ?? null };
+  }));
   const params = await searchParams;
-  return <><Nav name={profile.full_name} role={profile.role} admin /><main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8"><Hero eyebrow="Operations centre" title="See the work. Move it forward." description="A clear view of incoming reports, team activity and the issues closest to resolution." /><AdminTabs requests={requests ?? []} history={history ?? []} updated={params.updated === "1"} /></main></>;
+  return <><Nav name={profile.full_name} role={profile.role} admin /><main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8"><Hero eyebrow="Operations centre" title="See the work. Move it forward." description="A clear view of incoming reports, team activity and the issues closest to resolution." /><AdminTabs requests={requestsWithImages} history={history ?? []} updated={params.updated === "1"} /></main></>;
 }

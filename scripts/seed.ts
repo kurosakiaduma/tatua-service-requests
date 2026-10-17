@@ -39,12 +39,13 @@ async function main() {
     return date.toISOString();
   };
   const samples: Database["public"]["Tables"]["requests"]["Insert"][] = [
-    { citizen_id: demoCitizen, category: "streetlight", location: "Ngong Road near Adams Arcade", description: "The streetlight has been out for several nights, making the crossing unsafe.", status: "pending", image_path: "demo-citizen/streetlight.png", created_at: daysAgo(2), updated_at: daysAgo(2) },
-    { citizen_id: demoCitizen, category: "garbage", location: "Kileleshwa community centre", description: "Garbage collection has been missed twice this week and bins are overflowing.", status: "in_progress", image_path: null, created_at: daysAgo(4), updated_at: daysAgo(1) },
-    { citizen_id: demoCitizen, category: "water", location: "Lavington Crescent", description: "A leaking water pipe is pooling across the pedestrian path.", status: "resolved", image_path: "demo-citizen/water.png", created_at: daysAgo(6), updated_at: daysAgo(3) },
-    { citizen_id: demoCitizen, category: "roads", location: "Kilimani Ring Road", description: "A deep pothole has formed beside the school entrance and needs urgent repair.", status: "pending", image_path: null, created_at: daysAgo(8), updated_at: daysAgo(8) },
-    { citizen_id: demoCitizen, category: "sewage", location: "South B estate lane 4", description: "A blocked drain is causing wastewater to collect along the footpath.", status: "resolved", image_path: "demo-citizen/sewage.png", created_at: daysAgo(11), updated_at: daysAgo(7) },
-    { citizen_id: demoCitizen, category: "other", location: "Westlands market entrance", description: "The public notice board is damaged and important community notices cannot be displayed.", status: "in_progress", image_path: null, created_at: daysAgo(13), updated_at: daysAgo(5) },
+    { citizen_id: demoCitizen, category: "streetlight", location: "Murang'a town centre", description: "The streetlight has been out for several nights, making the crossing unsafe.", status: "pending", image_path: `${demoCitizen}/streetlight.png`, latitude: -0.721, longitude: 37.153, created_at: daysAgo(2), updated_at: daysAgo(2) },
+    { citizen_id: demoCitizen, category: "garbage", location: "Kahuro market", description: "Garbage collection has been missed twice this week and bins are overflowing.", status: "in_progress", image_path: null, latitude: -0.716, longitude: 37.148, created_at: daysAgo(4), updated_at: daysAgo(1) },
+    { citizen_id: demoCitizen, category: "water", location: "Murang'a hospital road", description: "A leaking water pipe is pooling across the pedestrian path.", status: "resolved", image_path: `${demoCitizen}/water.png`, latitude: -0.729, longitude: 37.157, created_at: daysAgo(6), updated_at: daysAgo(3) },
+    { citizen_id: demoCitizen, category: "roads", location: "Kang'ata avenue", description: "A deep pothole has formed beside the school entrance and needs urgent repair.", status: "pending", image_path: null, latitude: -0.725, longitude: 37.142, created_at: daysAgo(8), updated_at: daysAgo(8) },
+    { citizen_id: demoCitizen, category: "sewage", location: "Gakuyu estate lane 4", description: "A blocked drain is causing wastewater to collect along the footpath.", status: "resolved", image_path: `${demoCitizen}/sewage.png`, latitude: -0.713, longitude: 37.161, created_at: daysAgo(11), updated_at: daysAgo(7) },
+    { citizen_id: demoCitizen, category: "other", location: "Murang'a market entrance", description: "The public notice board is damaged and important community notices cannot be displayed.", status: "in_progress", image_path: null, latitude: -0.718, longitude: 37.151, created_at: daysAgo(13), updated_at: daysAgo(5) },
+    { citizen_id: demoCitizen, category: "roads", location: "Kang'ata avenue", description: "This pothole report duplicates an existing road maintenance request.", status: "rejected", image_path: null, latitude: -0.7255, longitude: 37.1425, created_at: daysAgo(15), updated_at: daysAgo(10) },
   ];
   for (const sample of samples) {
     const { data: existing, error: lookupError } = await supabase
@@ -65,6 +66,16 @@ async function main() {
       ? await supabase.from("requests").update(values).eq("id", existing.id)
       : await supabase.from("requests").insert(values);
     if (result.error) throw result.error;
+    const request = existing
+      ? (await supabase.from("requests").select("id").eq("id", existing.id).single()).data
+      : (await supabase.from("requests").select("id").eq("citizen_id", demoCitizen).eq("description", sample.description).single()).data;
+    if (!request) throw new Error("Could not find seeded request");
+    const note = sample.status === "rejected" ? "This report duplicates an existing road maintenance request already being tracked." : sample.status === "resolved" ? "The service team confirmed that the issue has been resolved." : "Report received by the service team.";
+    const { data: history } = await supabase.from("status_history").select("id").eq("request_id", request.id).eq("note", note).maybeSingle();
+    if (!history) {
+      const historyResult = await supabase.from("status_history").insert({ request_id: request.id, status: sample.status, changed_by: ids["admin@tatua.demo"], note, created_at: sample.updated_at });
+      if (historyResult.error) throw historyResult.error;
+    }
   }
   console.log("Tatua demo users and sample requests are ready.");
 }

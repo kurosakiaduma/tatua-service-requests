@@ -1,5 +1,11 @@
 export type Database = {
   public: {
+    Functions: {
+      post_request_update: {
+        Args: { p_request_id: string; p_status?: "pending" | "in_progress" | "resolved" | "rejected" | null; p_note?: string | null };
+        Returns: Database["public"]["Tables"]["status_history"]["Row"];
+      };
+    };
     Tables: {
       profiles: {
         Row: { id: string; full_name: string; role: "citizen" | "admin"; created_at: string };
@@ -10,18 +16,21 @@ export type Database = {
         Row: {
           id: string; citizen_id: string; category: "streetlight" | "water" | "garbage" | "roads" | "sewage" | "other";
           location: string; description: string; image_path: string | null;
-          status: "pending" | "in_progress" | "resolved"; created_at: string; updated_at: string;
+          latitude: number | null; longitude: number | null;
+          status: "pending" | "in_progress" | "resolved" | "rejected"; created_at: string; updated_at: string;
         };
         Insert: {
           id?: string; citizen_id: string; category: "streetlight" | "water" | "garbage" | "roads" | "sewage" | "other";
-          location: string; description: string; image_path?: string | null; status?: "pending" | "in_progress" | "resolved";
+          location: string; description: string; image_path?: string | null;
+          latitude?: number | null; longitude?: number | null;
+          status?: "pending" | "in_progress" | "resolved" | "rejected";
           created_at?: string; updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["requests"]["Insert"]>;
       };
       status_history: {
-        Row: { id: string; request_id: string; status: "pending" | "in_progress" | "resolved"; changed_by: string; note: string | null; created_at: string };
-        Insert: { id?: string; request_id: string; status: "pending" | "in_progress" | "resolved"; changed_by: string; note?: string | null; created_at?: string };
+        Row: { id: string; request_id: string; status: "pending" | "in_progress" | "resolved" | "rejected"; changed_by: string; note: string | null; created_at: string };
+        Insert: { id?: string; request_id: string; status: "pending" | "in_progress" | "resolved" | "rejected"; changed_by: string; note?: string | null; created_at?: string };
         Update: Partial<Database["public"]["Tables"]["status_history"]["Insert"]>;
       };
     };

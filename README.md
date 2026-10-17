@@ -8,11 +8,14 @@ its status through resolution.
 ## Features
 
 - Email/password citizen registration and login.
-- Request submission with category, location, description, and optional image.
+- Request submission with category, location, description, optional image, and a
+  Murang'a map pin.
 - Private Supabase Storage uploads restricted to image files up to 5 MB.
 - Citizen-only request visibility enforced by server authorization and RLS.
-- Admin dashboard with open/resolved analytics and status updates.
-- Status history recorded by database triggers.
+- Admin dashboard with open/resolved/rejected analytics and status updates.
+- An atomic, append-only status timeline records the time, status, message and
+  authenticated administrator for every update. Citizens see the actor as the
+  service team.
 - Responsive, keyboard-friendly UI with reusable status badges and clear
   loading, empty, and error states.
 - Daily Vercel cron request to `/api/health` to keep the free Supabase project
@@ -30,13 +33,25 @@ The database is the authorization boundary:
 | Table | Purpose |
 | --- | --- |
 | `profiles` | User name and `citizen`/`admin` role |
-| `requests` | Citizen report, category, location, description, image, status |
-| `status_history` | Immutable status transition timeline |
+| `requests` | Citizen report, category, location, coordinates, description, image, status |
+| `status_history` | Timeline entries with status, optional message and acting admin |
 | `healthcheck` | Trivial database query used by uptime checks |
 
 Migrations in `supabase/migrations` are the single source of truth. RLS uses
 the `is_admin()` security-definer helper to avoid trusting client-supplied
 roles. The service role key is never sent to the browser.
+
+Rejected requests require a reason of at least ten characters. Resolved and
+rejected requests are final until an administrator reopens them to in progress
+with a message. Duplicate reports expose only the duplicate explanation, never
+another citizen's private data. Private images are stored under the submitting
+user's UUID and are served with short-lived signed URLs.
+
+Maps use Leaflet and OpenStreetMap tiles without an API key. The map defaults to
+Murang'a town (approximately -0.72, 37.15). Place search uses Kenya-restricted
+Nominatim requests only after an explicit submit, with caching and a one-request
+per-second limit. Attribution is shown on every map, as required by the
+OpenStreetMap and Nominatim usage policies.
 
 ## Local setup
 
