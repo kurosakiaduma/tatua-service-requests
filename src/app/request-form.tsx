@@ -17,31 +17,38 @@ export function RequestForm({ action }: { action: (formData: FormData) => void }
   const [pin, setPin] = useState<[number, number] | null>(null);
   const compressing = useRef(false);
   const compressed = useRef(false);
+  const selectedFile = useRef<File | null>(null);
   const compressImage = async (file: File) => {
-    const bitmap = await createImageBitmap(file);
+    const bitmap = await decodeImage(file);
     const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(bitmap.width * scale));
     canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const context = canvas.getContext("2d");
+    if (!context) {
+      bitmap.close?.();
+      throw new Error("Could not create an image canvas");
+    }
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
-    bitmap.close();
-    if (!blob) throw new Error("Could not process image");
+    bitmap.close?.();
+    if (!blob || blob.size > 5 * 1024 * 1024) throw new Error("Image remains over 5 MB after compression");
     return new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg", lastModified: Date.now() });
   };
   return <form action={action} className="space-y-5" onSubmit={(event) => {
     if (compressing.current) return;
     const input = event.currentTarget.elements.namedItem("image") as HTMLInputElement | null;
     const image = input?.files?.[0];
-    if (image && (image.size > 5 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(image.type))) {
+    if (image && !["image/jpeg", "image/png", "image/webp"].includes(image.type)) {
       event.preventDefault();
       input?.setCustomValidity("Choose a JPG, PNG or WebP image under 5 MB.");
       input?.reportValidity();
     } else {
       input?.setCustomValidity("");
-      if (image && !compressed.current) {
+      if (image && !compressed.current && selectedFile.current !== image) {
         event.preventDefault();
         compressing.current = true;
+        selectedFile.current = image;
         void compressImage(image).then((compressedFile) => {
           const transfer = new DataTransfer();
           transfer.items.add(compressedFile);
@@ -66,4 +73,28 @@ export function RequestForm({ action }: { action: (formData: FormData) => void }
     <label className="block text-sm font-semibold text-card-foreground">Photo <span className="font-normal text-muted-foreground">(optional, JPG/PNG/WebP up to 5MB)</span><input name="image" type="file" accept="image/jpeg,image/png,image/webp" className="mt-2 block min-h-12 w-full rounded-lg border bg-background px-3 py-3 text-sm text-foreground" /></label>
     <SubmitButton />
   </form>;
+}
+
+type DecodedImage = CanvasImageSource & { width: number; height: number; close?: () => void };
+
+async function decodeImage(file: File): Promise<DecodedImage> {
+  if (typeof createImageBitmap === "function") {
+    try {
+      return await createImageBitmap(file);
+    } catch {
+      // Fall through to the HTML image decoder for browsers/codecs that reject the bitmap API.
+    }
+  }
+  const source = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("Could not decode image"));
+      element.src = source;
+    });
+    return image;
+  } finally {
+    URL.revokeObjectURL(source);
+  }
 }
