@@ -1,6 +1,10 @@
 export type Database = {
   public: {
     Functions: {
+      check_request_submission_limit: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
       get_linked_original_context: {
         Args: { p_report_id: string };
         Returns: unknown;

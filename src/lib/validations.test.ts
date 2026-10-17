@@ -35,6 +35,11 @@ describe("status validation", () => {
     expect(canTransition("resolved", "in_progress", "")).toBe(false);
     expect(canTransition("resolved", "in_progress", "The issue has returned and needs review.")).toBe(true);
   });
+  it("propagates ordinary status changes without requiring a note", () => {
+    expect(canTransition("pending", "in_progress")).toBe(true);
+    expect(canTransition("in_progress", "resolved")).toBe(true);
+    expect(canTransition("rejected", "in_progress", "Reviewing the issue again.")).toBe(true);
+  });
   it("allows only unlinked reports to link to primary requests", () => {
     expect(canLinkReport("report", "original", null, null)).toBe(true);
     expect(canLinkReport("report", "original", "other", null)).toBe(false);

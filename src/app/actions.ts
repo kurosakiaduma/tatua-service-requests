@@ -55,6 +55,10 @@ export async function createRequest(formData: FormData) {
   });
   if (!parsed.success) redirect("/dashboard?error=Please%20check%20the%20request%20details");
 
+  // Check before uploading so quota failures do not consume storage.
+  const { error: limitError } = await supabase.rpc("check_request_submission_limit");
+  if (limitError) redirect(`/dashboard?error=${encodeURIComponent(limitError.message)}`);
+
   let imagePath: string | null = null;
   const image = formData.get("image");
   if (image instanceof File && image.size > 0) {

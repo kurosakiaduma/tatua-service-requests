@@ -1,5 +1,7 @@
 # Tatua
 
+[![CI](https://github.com/kurosakiaduma/tatua-service-requests/actions/workflows/ci.yml/badge.svg)](https://github.com/kurosakiaduma/tatua-service-requests/actions/workflows/ci.yml)
+
 Tatua ("resolve" in Swahili) is a mini eCitizen-style public service request
 system. Citizens can report a broken streetlight, water issue, road problem,
 garbage collection problem, sewage issue, or another local concern and follow
@@ -10,6 +12,8 @@ its status through resolution.
 - Email/password citizen registration and login.
 - Request submission with category, location, description, optional image, and a
   Murang'a map pin.
+- Citizen submissions are limited to ten requests per hour to protect service
+  capacity and free-tier quotas.
 - Private Supabase Storage uploads restricted to image files up to 5 MB.
 - Citizen-only request visibility enforced by server authorization and RLS.
 - Admin dashboard with open/resolved/rejected analytics and status updates.
@@ -139,6 +143,11 @@ citizen UUID and access enforced by Storage RLS policies.
 Migrations in `supabase/migrations` are the single source of truth. RLS uses
 the `is_admin()` security-definer helper to avoid trusting client-supplied
 roles. The service role key is never sent to the browser.
+
+The database enforces a limit of ten submissions per citizen per rolling hour.
+An advisory transaction lock makes the check safe for concurrent submissions,
+and the server action checks before uploading an optional image so rejected
+submissions do not consume storage unnecessarily.
 
 Rejected requests require a reason of at least ten characters. Resolved and
 rejected requests are final until an administrator reopens them to in progress
