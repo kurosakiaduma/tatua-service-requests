@@ -45,7 +45,7 @@ async function main() {
     { citizen_id: demoCitizen, category: "roads", location: "Kang'ata avenue", description: "A deep pothole has formed beside the school entrance and needs urgent repair.", status: "pending", image_path: null, latitude: -0.725, longitude: 37.142, created_at: daysAgo(8), updated_at: daysAgo(8) },
     { citizen_id: demoCitizen, category: "sewage", location: "Gakuyu estate lane 4", description: "A blocked drain is causing wastewater to collect along the footpath.", status: "resolved", image_path: `${demoCitizen}/sewage.png`, latitude: -0.713, longitude: 37.161, created_at: daysAgo(11), updated_at: daysAgo(7) },
     { citizen_id: demoCitizen, category: "other", location: "Murang'a market entrance", description: "The public notice board is damaged and important community notices cannot be displayed.", status: "in_progress", image_path: null, latitude: -0.718, longitude: 37.151, created_at: daysAgo(13), updated_at: daysAgo(5) },
-    { citizen_id: demoCitizen, category: "roads", location: "Kang'ata avenue", description: "This pothole report duplicates an existing road maintenance request.", status: "rejected", image_path: null, latitude: -0.7255, longitude: 37.1425, created_at: daysAgo(15), updated_at: daysAgo(10) },
+    { citizen_id: demoCitizen, category: "roads", location: "Kang'ata avenue", description: "This pothole report duplicates an existing road maintenance request.", status: "pending", image_path: null, latitude: -0.7255, longitude: 37.1425, created_at: daysAgo(15), updated_at: daysAgo(10) },
   ];
   for (const sample of samples) {
     const { data: existing, error: lookupError } = await supabase
@@ -70,11 +70,35 @@ async function main() {
       ? (await supabase.from("requests").select("id").eq("id", existing.id).single()).data
       : (await supabase.from("requests").select("id").eq("citizen_id", demoCitizen).eq("description", sample.description).single()).data;
     if (!request) throw new Error("Could not find seeded request");
-    const note = sample.status === "rejected" ? "This report duplicates an existing road maintenance request already being tracked." : sample.status === "resolved" ? "The service team confirmed that the issue has been resolved." : "Report received by the service team.";
+    const note = sample.description.includes("duplicates") ? "Report received by the service team." : sample.status === "resolved" ? "The service team confirmed that the issue has been resolved." : "Report received by the service team.";
     const { data: history } = await supabase.from("status_history").select("id").eq("request_id", request.id).eq("note", note).maybeSingle();
     if (!history) {
       const historyResult = await supabase.from("status_history").insert({ request_id: request.id, status: sample.status, changed_by: ids["admin@tatua.demo"], note, created_at: sample.updated_at });
       if (historyResult.error) throw historyResult.error;
+    }
+  }
+  const { data: original } = await supabase.from("requests").select("id, status, reference").eq("citizen_id", demoCitizen).eq("description", "A deep pothole has formed beside the school entrance and needs urgent repair.").single();
+  const { data: duplicate } = await supabase.from("requests").select("id, reference").eq("citizen_id", demoCitizen).eq("description", "This pothole report duplicates an existing road maintenance request.").single();
+  if (!original || !duplicate) throw new Error("Could not find seeded duplicate pair");
+  const { error: oldHistoryError } = await supabase.from("status_history").delete().eq("request_id", duplicate.id).eq("status", "rejected");
+  if (oldHistoryError) throw oldHistoryError;
+  const { error: linkError } = await supabase.from("requests").update({ duplicate_of: original.id, status: original.status }).eq("id", duplicate.id);
+  if (linkError) throw linkError;
+  const linkNote = `Linked to ${original.reference}: the same road issue was already reported.`;
+  const { data: linkHistory } = await supabase.from("status_history").select("id").eq("request_id", duplicate.id).eq("note", linkNote).maybeSingle();
+  if (!linkHistory) {
+    const { error } = await supabase.from("status_history").insert({ request_id: duplicate.id, status: original.status, changed_by: ids["admin@tatua.demo"], note: linkNote });
+    if (error) throw error;
+  }
+  const originalNotes = [
+    "The service team acknowledged this road issue.",
+    "A maintenance crew has been scheduled to inspect the pothole.",
+  ];
+  for (const note of originalNotes) {
+    const { data: existingNote } = await supabase.from("status_history").select("id").eq("request_id", original.id).eq("note", note).maybeSingle();
+    if (!existingNote) {
+      const { error } = await supabase.from("status_history").insert({ request_id: original.id, status: original.status, changed_by: ids["admin@tatua.demo"], note });
+      if (error) throw error;
     }
   }
   console.log("Tatua demo users and sample requests are ready.");

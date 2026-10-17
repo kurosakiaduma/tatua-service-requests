@@ -16,6 +16,9 @@ its status through resolution.
 - An atomic, append-only status timeline records the time, status, message and
   authenticated administrator for every update. Citizens see the actor as the
   service team.
+- Duplicate reports remain visible as linked reports with a public reference
+  such as `TAT-000123`; they follow the original report's status without
+  inflating primary-request analytics.
 - Responsive, keyboard-friendly UI with reusable status badges and clear
   loading, empty, and error states.
 - Daily Vercel cron request to `/api/health` to keep the free Supabase project
@@ -44,14 +47,38 @@ roles. The service role key is never sent to the browser.
 Rejected requests require a reason of at least ten characters. Resolved and
 rejected requests are final until an administrator reopens them to in progress
 with a message. Duplicate reports expose only the duplicate explanation, never
-another citizen's private data. Private images are stored under the submitting
+another citizen's private data; linked reports expose their own details and a
+narrow public view of the original. Private images are stored under the submitting
 user's UUID and are served with short-lived signed URLs.
+
+Every request gets a unique `TAT-######` reference. Administrators link an
+unlinked report to an existing primary report through atomic database functions.
+The linked report keeps its own description, image and citizen visibility,
+follows the original status (including rejection and reopening), and can later
+be unlinked back to Pending. Database constraints reject chains, self-links and
+second links.
+
+Citizens never receive another citizen's row, image, or raw timeline through
+RLS. A linked citizen can call only a narrow security-definer function for the
+original's reference, category, location, coordinates, status, created date
+and public timeline. Descriptions, images, reporter identity and other linked
+reports are excluded.
 
 Maps use Leaflet and OpenStreetMap tiles without an API key. The map defaults to
 Murang'a town (approximately -0.72, 37.15). Place search uses Kenya-restricted
 Nominatim requests only after an explicit submit, with caching and a one-request
 per-second limit. Attribution is shown on every map, as required by the
 OpenStreetMap and Nominatim usage policies.
+
+Location text and the map pin stay synchronized in both directions. Dropping,
+dragging, searching, or using the current location reverse-geocodes an address
+when possible, while preserving text the citizen typed and offering a
+confirmation before replacing it. Enter or **Find on map** geocodes only on
+explicit submit; an empty result leaves the text unchanged. The expanded map
+dialog has Confirm and Cancel so an exploratory pin can be discarded. Request
+photos are resized in the browser to a maximum 1600 pixels on the long edge
+and compressed before upload; the lightbox uses signed URLs and no paid image
+transformations.
 
 ## Local setup
 
@@ -140,4 +167,6 @@ Live URL: [Tatua Service Requests](https://tatua-service-requests.vercel.app/)
 
 ## Screenshots
 
-Screenshots can be added here after the production deployment is available.
+Refresh screenshots after the production smoke test and add the citizen
+expanded-map view, citizen linked-report timeline, and admin linked-reports
+panel here. No image assets are checked in until that smoke test is complete.

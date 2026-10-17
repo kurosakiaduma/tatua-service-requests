@@ -6,6 +6,10 @@ export function canTransition(from: Status, to: Status, note = "") {
   return true;
 }
 
+export function canLinkReport(reportId: string, originalId: string, reportDuplicateOf: string | null, originalDuplicateOf: string | null) {
+  return reportId !== originalId && reportDuplicateOf === null && originalDuplicateOf === null;
+}
+
 export function isFinalStatus(status: Status) {
   return status === "resolved" || status === "rejected";
 }

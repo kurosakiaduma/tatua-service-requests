@@ -93,3 +93,33 @@ export async function updateRequestStatus(formData: FormData) {
   revalidatePath("/dashboard");
   redirect("/admin?updated=1");
 }
+
+export async function linkRequest(formData: FormData) {
+  const reportId = String(formData.get("reportId") ?? "");
+  const originalId = String(formData.get("originalId") ?? "");
+  const note = String(formData.get("note") ?? "").trim() || null;
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") redirect("/dashboard");
+  const { error } = await supabase.rpc("link_request", { p_report_id: reportId, p_original_id: originalId, p_note: note });
+  if (error) redirect(`/admin?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+  redirect("/admin?updated=1");
+}
+
+export async function unlinkRequest(formData: FormData) {
+  const reportId = String(formData.get("reportId") ?? "");
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") redirect("/dashboard");
+  const { error } = await supabase.rpc("unlink_request", { p_report_id: reportId });
+  if (error) redirect(`/admin?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+  redirect("/admin?updated=1");
+}
