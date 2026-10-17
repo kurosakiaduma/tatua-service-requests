@@ -40,6 +40,102 @@ The database is the authorization boundary:
 | `status_history` | Timeline entries with status, optional message and acting admin |
 | `healthcheck` | Trivial database query used by uptime checks |
 
+### Application architecture
+
+```mermaid
+flowchart LR
+    Citizen[Citizen browser] -->|Server actions and reads| App[Next.js App Router]
+    Admin[Admin browser] -->|Server actions and reads| App
+    App -->|SSR auth session| Supabase[Supabase]
+    App -->|RLS-protected queries and RPCs| Database[(Postgres)]
+    App -->|Private upload and signed URL| Storage[(Supabase Storage)]
+    Database -->|Auth trigger creates profile| Auth[(Supabase Auth)]
+    Vercel[Vercel cron] -->|Daily GET /api/health| Health[Health route]
+    Health -->|Service-role query| Database
+    Map[Leaflet + OpenStreetMap] -.-> Citizen
+```
+
+The normal application path uses the browser's authenticated Supabase session
+through the Next.js server client. Row Level Security limits citizens to their
+own data, while administrator-only mutations are exposed through guarded server
+actions and security-definer database functions. The service-role client is
+used only by the health route and never reaches the browser.
+
+### Request lifecycle
+
+```mermaid
+flowchart TD
+    Submit[Citizen submits report] --> Validate[Validate fields and optional image]
+    Validate -->|Valid| Create[Insert request as pending]
+    Validate -->|Invalid| Error[Return form error]
+    Create --> Initial[Trigger records initial status]
+    Initial --> Review[Admin reviews request]
+    Review --> Decision{Admin action}
+    Decision -->|Update status or note| Update[Guarded post_request_update RPC]
+    Decision -->|Link duplicate| Link[Guarded link_request RPC]
+    Decision -->|Leave separate| Monitor[Continue tracking]
+    Update --> History[Append status_history entry]
+    Link --> Follow[Linked report follows original status]
+    History --> Notify[Citizen sees current status and timeline]
+    Follow --> Notify
+    Monitor --> Notify
+    Notify -->|Resolved or rejected| Final[Final state]
+    Final -->|Admin reopens| Update
+```
+
+### Database schema
+
+The checked-in diagram below is the Supabase schema snapshot. The Mermaid
+diagram provides a readable version of the same application-owned tables and
+their important relationships; `auth.users` is managed by Supabase Auth.
+
+```mermaid
+erDiagram
+    AUTH_USERS ||--|| PROFILES : "has"
+    PROFILES ||--o{ REQUESTS : submits
+    REQUESTS ||--o{ STATUS_HISTORY : records
+    PROFILES ||--o{ STATUS_HISTORY : changes
+    REQUESTS }o--o| REQUESTS : "duplicate_of"
+
+    AUTH_USERS {
+        uuid id PK
+    }
+    PROFILES {
+        uuid id PK, FK
+        text full_name
+        user_role role
+        timestamptz created_at
+    }
+    REQUESTS {
+        uuid id PK
+        uuid citizen_id FK
+        request_category category
+        text location
+        text description
+        text image_path
+        request_status status
+        text reference UK
+        uuid duplicate_of FK
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    STATUS_HISTORY {
+        uuid id PK
+        uuid request_id FK
+        request_status status
+        uuid changed_by FK
+        text note
+        timestamptz created_at
+    }
+```
+
+![Supabase schema diagram](./public/supabase-schema-lweadehzhunuykqyzuqw.png)
+
+`healthcheck` is intentionally independent of the request graph and is queried
+by the daily uptime endpoint. Request images are stored separately in the
+private `request-images` bucket, with the first storage path segment set to the
+citizen UUID and access enforced by Storage RLS policies.
+
 Migrations in `supabase/migrations` are the single source of truth. RLS uses
 the `is_admin()` security-definer helper to avoid trusting client-supplied
 roles. The service role key is never sent to the browser.
@@ -161,12 +257,37 @@ The repository is designed for Vercel Hobby with the existing Supabase project:
 The daily cron is configured in [vercel.json](./vercel.json). Add the final
 production URL here after the Vercel project is created:
 
-```text
-Live URL: [Tatua Service Requests](https://tatua-service-requests.vercel.app/)
-```
+
+```Live URL:``` [Tatua Service Requests](https://tatua-service-requests.vercel.app/)
 
 ## Screenshots
 
-Refresh screenshots after the production smoke test and add the citizen
-expanded-map view, citizen linked-report timeline, and admin linked-reports
-panel here. No image assets are checked in until that smoke test is complete.
+### Landing and authentication
+
+| Landing page | Sign up — light theme |
+| --- | --- |
+| ![Tatua landing page](./public/images/screenshots/landing.png) | ![Sign-up page in the light theme](./public/images/screenshots/sign_up_light.png) |
+
+| Sign up — dark theme |
+| --- |
+| ![Sign-up page in the dark theme](./public/images/screenshots/sign_up_dark.png) |
+
+### Citizen experience
+
+| Citizen landing page | Citizen requests |
+| --- | --- |
+| ![Citizen landing page](./public/images/screenshots/citizen_landing.png) | ![Citizen requests list](./public/images/screenshots/citizen_requests.png) |
+
+| Citizen request details |
+| --- |
+| ![Citizen request details](./public/images/screenshots/citizen_request_details.png) |
+
+### Admin experience
+
+| Admin landing page | Admin requests |
+| --- | --- |
+| ![Admin landing page](./public/images/screenshots/admin_landing.png) | ![Admin requests list](./public/images/screenshots/admin_requests.png) |
+
+| Admin request details |
+| --- |
+| ![Admin request details](./public/images/screenshots/admin_request_details.png) |
