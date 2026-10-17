@@ -263,8 +263,7 @@ The repository is designed for Vercel Hobby with the existing Supabase project:
 3. Deploy the `main` branch.
 4. Confirm `/api/health` returns `{"ok":true}`.
 
-The daily cron is configured in [vercel.json](./vercel.json). Add the final
-production URL here after the Vercel project is created:
+The daily cron is configured in [vercel.json](./vercel.json).
 
 
 ```Live URL:``` [Tatua Service Requests](https://tatua-service-requests.vercel.app/)
