@@ -15,6 +15,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
     supabase.from("requests").select("*").order("created_at", { ascending: false }),
     supabase.from("status_history").select("*").order("created_at", { ascending: false }).limit(100),
   ]);
+  // The bucket is private; URLs are short-lived and generated per authorized admin view.
   const requestsWithImages = await Promise.all((requests ?? []).map(async (request) => {
     if (!request.image_path) return { ...request, image_url: null };
     const { data } = await supabase.storage.from("request-images").createSignedUrl(request.image_path, 3600);

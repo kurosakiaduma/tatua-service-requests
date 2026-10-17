@@ -18,6 +18,7 @@ export function RequestForm({ action }: { action: (formData: FormData) => void }
   const compressing = useRef(false);
   const compressed = useRef(false);
   const selectedFile = useRef<File | null>(null);
+  // Resize before upload so the server receives predictable, storage-friendly files.
   const compressImage = async (file: File) => {
     const bitmap = await decodeImage(file);
     const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
@@ -82,7 +83,7 @@ async function decodeImage(file: File): Promise<DecodedImage> {
     try {
       return await createImageBitmap(file);
     } catch {
-      // Fall through to the HTML image decoder for browsers/codecs that reject the bitmap API.
+      // Some browsers/codecs reject createImageBitmap; the HTML decoder is the fallback.
     }
   }
   const source = URL.createObjectURL(file);

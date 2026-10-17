@@ -48,6 +48,7 @@ as $$
   );
 $$;
 
+-- Keep profile creation in the database so every authenticated user has a role row.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -111,6 +112,7 @@ begin
 end;
 $$;
 
+-- Status history is append-only; updates create entries through this trigger or RPCs.
 create trigger requests_status_history
   after update of status on public.requests
   for each row execute procedure public.record_status_change();

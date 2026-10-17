@@ -1,5 +1,6 @@
 create sequence if not exists public.request_reference_seq;
 
+-- A linked report keeps its own row and points at one primary report.
 alter table public.requests
   add column if not exists reference text,
   add column if not exists duplicate_of uuid references public.requests(id) on delete set null;
@@ -76,6 +77,7 @@ begin
 end;
 $$;
 
+-- Prevent chains, self-links, and relinking after a report has been linked.
 drop trigger if exists requests_validate_link on public.requests;
 create trigger requests_validate_link
   before insert or update of duplicate_of on public.requests

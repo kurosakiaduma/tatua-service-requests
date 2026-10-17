@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+/** Creates a request-scoped Supabase client whose session is stored in cookies. */
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -21,7 +22,7 @@ export async function createServerSupabaseClient() {
             cookieStore.set(name, value, options),
           );
         } catch {
-          // Server components cannot always write cookies; middleware refreshes sessions.
+          // Server components may be read-only; middleware refreshes sessions when needed.
         }
       },
     },

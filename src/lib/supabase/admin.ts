@@ -1,4 +1,4 @@
-/** Creates a server-only Supabase client for trusted health checks and admin operations. */
+/** Creates the server-only service-role client used by the health endpoint. */
 
 import { createClient } from "@supabase/supabase-js";
 

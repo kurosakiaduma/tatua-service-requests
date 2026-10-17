@@ -7,6 +7,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { requestSchema, signUpSchema, statusUpdateSchema } from "@/lib/validations";
 import { canTransition } from "@/lib/status-rules";
 
+/** Creates an authenticated citizen account and lets the database trigger create its profile. */
 export async function signUp(formData: FormData) {
   const parsed = signUpSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) redirect("/register?error=Please%20check%20your%20details");
@@ -20,6 +21,7 @@ export async function signUp(formData: FormData) {
   redirect("/dashboard?welcome=1");
 }
 
+/** Signs a user in and routes administrators to the operations dashboard. */
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
@@ -30,12 +32,14 @@ export async function signIn(formData: FormData) {
   redirect(data?.role === "admin" ? "/admin" : "/dashboard");
 }
 
+/** Clears the server-side Supabase session before returning to the public landing page. */
 export async function signOut() {
   const supabase = await createServerSupabaseClient();
   await supabase.auth.signOut();
   redirect("/");
 }
 
+/** Validates and stores a citizen report, including an optional private image upload. */
 export async function createRequest(formData: FormData) {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -56,6 +60,7 @@ export async function createRequest(formData: FormData) {
     if (image.size > 5 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(image.type)) {
       redirect("/dashboard?error=Images%20must%20be%20JPG%2C%20PNG%20or%20WebP%20under%205MB");
     }
+    // Keep uploads inside the citizen's storage folder so Storage RLS can enforce ownership.
     imagePath = `${user.id}/${crypto.randomUUID()}-${image.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
     const { error } = await supabase.storage.from("request-images").upload(imagePath, image);
     if (error) redirect("/dashboard?error=We%20could%20not%20upload%20that%20image.%20Please%20try%20again.");
@@ -71,6 +76,7 @@ export async function createRequest(formData: FormData) {
   redirect("/dashboard?created=1");
 }
 
+/** Performs client-side rule checks, then delegates the atomic status update to Postgres. */
 export async function updateRequestStatus(formData: FormData) {
   const parsed = statusUpdateSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) redirect("/admin?error=Invalid%20status%20update");
@@ -94,6 +100,7 @@ export async function updateRequestStatus(formData: FormData) {
   redirect("/admin?updated=1");
 }
 
+/** Links a duplicate report to an original through the guarded database function. */
 export async function linkRequest(formData: FormData) {
   const reportId = String(formData.get("reportId") ?? "");
   const originalId = String(formData.get("originalId") ?? "");
@@ -110,6 +117,7 @@ export async function linkRequest(formData: FormData) {
   redirect("/admin?updated=1");
 }
 
+/** Restores a linked report to an independent pending request. */
 export async function unlinkRequest(formData: FormData) {
   const reportId = String(formData.get("reportId") ?? "");
   const supabase = await createServerSupabaseClient();

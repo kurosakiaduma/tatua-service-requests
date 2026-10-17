@@ -15,11 +15,13 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     supabase.from("requests").select("*").eq("citizen_id", user.id).order("created_at", { ascending: false }),
     supabase.from("status_history").select("*").order("created_at", { ascending: true }),
   ]);
+  // Signed URLs keep request images private while allowing the dashboard to display them.
   const requestsWithImages = await Promise.all((requests ?? []).map(async (request) => {
     if (!request.image_path) return { ...request, image_url: null };
     const { data } = await supabase.storage.from("request-images").createSignedUrl(request.image_path, 3600);
     return { ...request, image_url: data?.signedUrl ?? null };
   }));
+  // This RPC returns only the original report fields safe for a linked citizen to see.
   const originalContexts = Object.fromEntries(await Promise.all((requests ?? []).filter((request) => request.duplicate_of).map(async (request) => {
     const { data } = await supabase.rpc("get_linked_original_context", { p_report_id: request.id });
     return [request.id, (data as LinkedOriginalContext | null) ?? null] as const;

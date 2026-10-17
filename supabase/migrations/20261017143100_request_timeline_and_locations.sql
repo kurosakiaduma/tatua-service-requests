@@ -6,6 +6,7 @@ alter table public.requests
   add constraint requests_latitude_range check (latitude is null or latitude between -90 and 90),
   add constraint requests_longitude_range check (longitude is null or longitude between -180 and 180);
 
+-- These mutations run with definer privileges, but still verify the caller's role.
 drop policy if exists "Citizens create own requests" on public.requests;
 create policy "Authenticated users create own requests"
   on public.requests for insert to authenticated

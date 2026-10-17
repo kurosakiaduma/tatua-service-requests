@@ -2,6 +2,7 @@ import { connection, NextResponse } from "next/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 
+/** Keeps the hosted database warm and exposes a minimal deployment health signal. */
 export async function GET() {
   await connection();
   const { error } = await createAdminClient()

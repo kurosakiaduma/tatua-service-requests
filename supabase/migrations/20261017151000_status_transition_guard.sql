@@ -13,6 +13,7 @@ declare
   result public.status_history;
   next_status public.request_status;
 begin
+  -- Lock the primary row so its status and linked reports change atomically.
   if not public.is_admin() then
     raise exception 'Only administrators can post updates';
   end if;

@@ -9,6 +9,7 @@ export const categories = [
   "other",
 ] as const;
 
+// Keep these values aligned with the Postgres enum and the status badge labels.
 export const statuses = ["pending", "in_progress", "resolved", "rejected"] as const;
 
 export const signUpSchema = z.object({
