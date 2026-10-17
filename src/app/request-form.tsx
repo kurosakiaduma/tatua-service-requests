@@ -1,5 +1,6 @@
 "use client";
 
+// Citizen report form with synchronized map data and client-side image preparation.
 import { useFormStatus } from "react-dom";
 import { useRef, useState } from "react";
 import { CategoryIcon, categoryConfig } from "@/lib/categories";
@@ -11,6 +12,7 @@ function SubmitButton() {
   return <button disabled={pending} className="min-h-12 rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60">{pending ? "Submitting..." : "Submit request"}</button>;
 }
 
+/** Collects and submits a validated citizen report with optional media. */
 export function RequestForm({ action }: { action: (formData: FormData) => void }) {
   const [category, setCategory] = useState<(typeof categories)[number]>("streetlight");
   const [location, setLocation] = useState("");

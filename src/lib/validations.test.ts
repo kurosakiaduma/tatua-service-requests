@@ -1,3 +1,4 @@
+// Focused tests for the shared request and authentication validation schemas.
 import { describe, expect, it } from "vitest";
 import { requestSchema, signUpSchema, statusUpdateSchema } from "./validations";
 import { canTransition } from "./status-rules";

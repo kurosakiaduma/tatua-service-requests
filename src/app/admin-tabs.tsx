@@ -1,5 +1,6 @@
 "use client";
 
+// Administrator workspace for request triage, updates, linking, and activity review.
 import { useEffect, useMemo, useState } from "react";
 import { Activity, BarChart3, Link2, Search, SlidersHorizontal, Unlink } from "lucide-react";
 import { toast } from "sonner";
@@ -14,6 +15,7 @@ import { CategoryBadge } from "@/lib/categories";
 type RequestWithImage = ServiceRequest & { image_url?: string | null };
 type Props = { requests: RequestWithImage[]; history: StatusHistory[]; updated?: boolean };
 
+/** Renders filtered request views, analytics, and request management actions. */
 export function AdminTabs({ requests, history, updated = false }: Props) {
   const [tab, setTab] = useState("overview");
   const [search, setSearch] = useState("");

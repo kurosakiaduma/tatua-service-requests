@@ -1,3 +1,4 @@
+// Request-scoped Supabase client that reads and refreshes the user session.
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 

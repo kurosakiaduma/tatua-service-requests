@@ -1,5 +1,6 @@
 "use server";
 
+// Server actions are the authenticated mutation boundary for the application.
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 

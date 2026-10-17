@@ -1,5 +1,6 @@
 "use client";
 
+// Citizen workspace tabs for creating reports and reviewing private request history.
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -13,6 +14,8 @@ import { CategoryBadge, categoryConfig } from "@/lib/categories";
 import { MapPreview } from "@/app/map";
 
 type RequestWithImage = ServiceRequest & { image_url?: string | null };
+
+/** Renders the citizen request form, list, and selected request detail drawer. */
 export function CitizenTabs({ requests, history, originalContexts }: { requests: RequestWithImage[]; history: StatusHistory[]; originalContexts: Record<string, LinkedOriginalContext | null> }) {
   const router = useRouter();
   const params = useSearchParams();

@@ -1,5 +1,6 @@
 "use client";
 
+// Leaflet controls for selecting, reverse-geocoding, and previewing locations.
 import dynamic from "next/dynamic";
 import { LocateFixed, Maximize2, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { canReplaceLocationText, coordinatesFallback } from "@/lib/location-sync";
 import "leaflet/dist/leaflet.css";
 
+/** Default map center for Murang'a town when no pin has been selected. */
 export const MURANGA_CENTER: [number, number] = [-0.72, 37.15];
 const LeafletMap = dynamic(() => import("react-leaflet").then((module) => module.MapContainer), { ssr: false });
 const reverseCache = new Map<string, string>();
@@ -25,6 +27,7 @@ function readableAddress(data: { display_name?: string; address?: Record<string,
   return parts.length ? parts.slice(0, 3).join(", ") : data.display_name ?? coordinatesFallback(value);
 }
 
+/** Looks up a Kenya-restricted address for a selected coordinate. */
 export async function reverseGeocode(value: [number, number]) {
   const key = keyFor(value);
   const cached = reverseCache.get(key);
@@ -80,6 +83,7 @@ function MapCanvas({ value, onChange, zoom = 12 }: { value: [number, number] | n
   return <LeafletMap center={value ?? MURANGA_CENTER} zoom={zoom} scrollWheelZoom={false} touchZoom="center" className="h-full w-full"><TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /><MapInteractions value={value} onChange={onChange} /></LeafletMap>;
 }
 
+/** Provides an editable map pin synchronized with the location text field. */
 export function MapPicker({ locationText, onLocationTextChange, value, onChange }: { locationText: string; onLocationTextChange: (value: string) => void; value: [number, number] | null; onChange: (value: [number, number] | null) => void }) {
   const [expanded, setExpanded] = useState(false);
   const [draftValue, setDraftValue] = useState(value);
@@ -145,6 +149,7 @@ export function MapPicker({ locationText, onLocationTextChange, value, onChange 
   </>;
 }
 
+/** Displays a non-interactive map for an already stored request location. */
 export function MapPreview({ latitude, longitude }: { latitude: number | null; longitude: number | null }) {
   if (latitude === null || longitude === null) return null;
   const value: [number, number] = [latitude, longitude];

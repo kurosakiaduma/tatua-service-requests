@@ -4,7 +4,9 @@ import { Nav } from "@/app/nav";
 import { Hero } from "@/app/hero";
 import { AdminTabs } from "@/app/admin-tabs";
 
+// Administrator dashboard guarded by both the profile role and database RLS.
 export const instant = false;
+/** Loads operational data for an authorized administrator. */
 export default async function Admin({ searchParams }: { searchParams: Promise<{ updated?: string }> }) {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();

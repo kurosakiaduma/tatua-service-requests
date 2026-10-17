@@ -1,3 +1,4 @@
+// Compact status indicator shared by citizen and administrator request views.
 import { CircleCheck, CircleDot, CircleX, LoaderCircle } from "lucide-react";
 import type { Status } from "@/lib/validations";
 
@@ -8,6 +9,7 @@ const config: Record<Status, { label: string; className: string; Icon: typeof Ci
   rejected: { label: "Rejected", className: "bg-destructive/15 text-destructive", Icon: CircleX },
 };
 
+/** Renders the label and visual treatment for a request status. */
 export function StatusBadge({ status }: { status: Status }) {
   const { label, className, Icon } = config[status];
   return <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${className}`}><Icon size={14} aria-hidden="true" />{label}</span>;

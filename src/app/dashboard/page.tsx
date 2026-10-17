@@ -5,7 +5,9 @@ import { Hero } from "@/app/hero";
 import { CitizenTabs } from "@/app/citizen-tabs";
 import type { LinkedOriginalContext } from "@/lib/types";
 
+// Citizen dashboard that loads only the signed-in user's reports and safe context.
 export const instant = false;
+/** Loads the citizen workspace data and renders the request dashboard. */
 export default async function Dashboard({ searchParams }: { searchParams: Promise<{ error?: string; created?: string; welcome?: string; tab?: string }> }) {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();

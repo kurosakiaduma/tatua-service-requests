@@ -1,5 +1,6 @@
 "use client";
 
+// Client-only Plotly analytics for primary requests and their recent status trends.
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import type { ReactNode } from "react";
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 const FALLBACK_COLORS = { text: "#102a2e", grid: "#cbdad8", primary: "#087f78", info: "#155e92", success: "#16704b", warning: "#8a5a00", danger: "#b42318" };
 
+/** Renders administrator charts while deriving colors from the active theme. */
 export function AdminCharts({ requests }: { requests: { category: string; status: string; created_at: string; updated_at: string; duplicate_of: string | null }[] }) {
   const { resolvedTheme } = useTheme();
   const [colors, setColors] = useState(FALLBACK_COLORS);

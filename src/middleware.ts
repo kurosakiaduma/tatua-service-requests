@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Refreshes Supabase auth cookies before protected server-rendered pages read them.
 /** Refreshes the Supabase auth cookie before server components read the session. */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });

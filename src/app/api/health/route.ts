@@ -1,5 +1,6 @@
 import { connection, NextResponse } from "next/server";
 
+// Minimal database probe used by the scheduled uptime check.
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /** Keeps the hosted database warm and exposes a minimal deployment health signal. */

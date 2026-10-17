@@ -1,3 +1,4 @@
+// Pure client-side mirrors of database-enforced request workflow rules.
 import type { Status } from "@/lib/validations";
 
 /** Mirrors the user-facing status rules before the database performs the final check. */

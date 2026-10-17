@@ -1,11 +1,13 @@
 "use client";
 
+// Authenticated navigation with responsive links, account actions, and theme control.
 import Link from "next/link";
 import { Menu, Shield, UserRound, X } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "@/app/actions";
 import { ThemeToggle } from "@/app/theme-toggle";
 
+/** Renders navigation appropriate to the current user's role. */
 export function Nav({ name, role, admin = false }: { name: string; role?: string; admin?: boolean }) {
   const [open, setOpen] = useState(false);
   const links = [{ href: "/dashboard", label: "Report an issue" }, { href: "/dashboard?tab=requests", label: "My requests" }, ...(admin ? [{ href: "/admin", label: "Admin dashboard" }] : [])];

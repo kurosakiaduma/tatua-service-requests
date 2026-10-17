@@ -1,3 +1,4 @@
+// Small helpers that preserve user-entered location text during map updates.
 /** Allows geocoding to replace text only when it is empty or previously auto-filled. */
 export function canReplaceLocationText(text: string, wasAutoFilled: boolean) {
   return !text.trim() || wasAutoFilled;

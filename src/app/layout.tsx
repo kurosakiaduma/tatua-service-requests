@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
+// Defines global metadata, fonts, providers, and the document shell.
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
   },
 };
 
+/** Wraps every route in the global document, fonts, metadata, and providers. */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html

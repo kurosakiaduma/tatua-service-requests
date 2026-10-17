@@ -1,5 +1,6 @@
 "use client";
 
+// Private request-image thumbnail and keyboard-navigable lightbox.
 import { useState } from "react";
 import Image from "next/image";
 import { Maximize2 } from "lucide-react";
@@ -7,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } 
 
 export type ImageLightboxItem = { url: string; reference: string; category: string; createdAt: string; alt: string };
 
+/** Shows a request thumbnail and opens keyboard-navigable full-size images. */
 export function ImageThumbnail({ item, items = [item], className = "" }: { item: ImageLightboxItem; items?: ImageLightboxItem[]; className?: string }) {
   const [loaded, setLoaded] = useState(false);
   const [index, setIndex] = useState(Math.max(0, items.findIndex((candidate) => candidate.url === item.url)));
