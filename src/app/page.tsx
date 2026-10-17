@@ -1,29 +1,14 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { ArrowRight, CheckCircle2, FileText, Search, ShieldCheck } from "lucide-react";
+import { Hero } from "@/app/hero";
+
+const categories = ["Streetlights", "Water supply", "Garbage collection", "Roads", "Sewage", "Other local issues"];
+
 export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-6 py-16">
-      <section className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white p-10 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-700">
-          Tatua
-        </p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
-          Public service requests, resolved together.
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-600">
-          Report a local issue and follow its progress from submission to
-          resolution. The application foundation is ready for the citizen and
-          administrator workflows.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3 text-sm font-medium">
-          <a className="rounded-lg bg-teal-700 px-5 py-3 text-white hover:bg-teal-800" href="/register">Report an issue</a>
-          <a className="rounded-lg border border-slate-300 px-5 py-3 text-slate-800 hover:bg-slate-50" href="/login">Sign in</a>
-          <a
-            className="rounded-lg border border-transparent px-5 py-3 text-slate-600 hover:text-teal-700"
-            href="/api/health"
-          >
-            System health
-          </a>
-        </div>
-      </section>
-    </main>
-  );
+  return <main className="min-h-screen"><div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"><div className="flex items-center justify-between"><Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary"><span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground"><ShieldCheck size={20} /></span>Tatua</Link><div className="flex items-center gap-2"><Link href="/login" className="min-h-11 rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-accent">Sign in</Link><Link href="/register" className="min-h-11 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">Get started</Link></div></div><div className="mt-8"><Hero eyebrow="Public service, made visible" title="Report an issue. Track the resolution." description="Tatua connects residents with the teams responsible for keeping neighbourhoods safe, clean and moving." /></div><section className="grid gap-5 py-12 md:grid-cols-3"><Step icon={<FileText />} title="1. Tell us" text="Submit a clear report with a location, details and an optional photo." /><Step icon={<Search />} title="2. Follow progress" text="See when your report is pending, in progress or resolved." /><Step icon={<CheckCircle2 />} title="3. See results" text="Stay informed while your local service team responds." /></section><section className="border-t py-10"><p className="text-sm font-bold uppercase tracking-[0.18em] text-primary">What you can report</p><div className="mt-5 flex flex-wrap gap-3">{categories.map((category) => <span key={category} className="rounded-full border bg-card px-4 py-2 text-sm font-semibold text-card-foreground">{category}</span>)}</div></section><section className="hero-gradient mt-6 flex flex-col gap-5 rounded-3xl p-7 text-primary-foreground sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-2xl font-bold">Ready to make a difference?</h2><p className="mt-1 opacity-90">Create your free citizen account in under a minute.</p></div><Link href="/register" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-card px-5 font-bold text-card-foreground hover:opacity-90">Create an account <ArrowRight size={18} /></Link></section><p className="py-8 text-center text-sm text-muted-foreground">Tatua · Resolve together</p></div></main>;
+}
+
+function Step({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
+  return <article className="rounded-2xl border bg-card p-6"><div className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground">{icon}</div><h2 className="mt-5 text-lg font-bold text-card-foreground">{title}</h2><p className="mt-2 leading-6 text-muted-foreground">{text}</p></article>;
 }

@@ -120,7 +120,7 @@ The daily cron is configured in [vercel.json](./vercel.json). Add the final
 production URL here after the Vercel project is created:
 
 ```text
-Live URL: pending Vercel project setup
+Live URL: [Tatua Service Requests](https://tatua-service-requests.vercel.app/)
 ```
 
 ## Screenshots

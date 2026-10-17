@@ -2,9 +2,9 @@ import { CircleCheck, CircleDot, LoaderCircle } from "lucide-react";
 import type { Status } from "@/lib/validations";
 
 const config: Record<Status, { label: string; className: string; Icon: typeof CircleDot }> = {
-  pending: { label: "Pending", className: "bg-amber-50 text-amber-800", Icon: CircleDot },
-  in_progress: { label: "In progress", className: "bg-blue-50 text-blue-800", Icon: LoaderCircle },
-  resolved: { label: "Resolved", className: "bg-emerald-50 text-emerald-800", Icon: CircleCheck },
+  pending: { label: "Pending", className: "bg-warning/15 text-warning", Icon: CircleDot },
+  in_progress: { label: "In progress", className: "bg-info/15 text-info", Icon: LoaderCircle },
+  resolved: { label: "Resolved", className: "bg-success/15 text-success", Icon: CircleCheck },
 };
 
 export function StatusBadge({ status }: { status: Status }) {
