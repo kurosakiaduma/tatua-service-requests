@@ -12,5 +12,12 @@ const config: Record<Status, { label: string; className: string; Icon: typeof Ci
 /** Renders the label and visual treatment for a request status. */
 export function StatusBadge({ status }: { status: Status }) {
   const { label, className, Icon } = config[status];
-  return <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${className}`}><Icon size={14} aria-hidden="true" />{label}</span>;
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${className}`}
+    >
+      <Icon size={14} aria-hidden="true" />
+      {label}
+    </span>
+  );
 }

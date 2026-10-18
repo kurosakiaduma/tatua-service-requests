@@ -52,7 +52,7 @@ describe("createRequest server action", () => {
     rpc.mockResolvedValue({ error: new Error("You can submit at most 10 requests per hour.") });
 
     await expect(createRequest(validForm())).rejects.toThrow(
-      "REDIRECT:/dashboard?error=You%20can%20submit%20at%20most%2010%20requests%20per%20hour."
+      "REDIRECT:/dashboard?error=You%20can%20submit%20at%20most%2010%20requests%20per%20hour.",
     );
 
     expect(upload).not.toHaveBeenCalled();

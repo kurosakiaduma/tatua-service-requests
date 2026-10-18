@@ -8,8 +8,115 @@ import { signOut } from "@/app/actions";
 import { ThemeToggle } from "@/app/theme-toggle";
 
 /** Renders navigation appropriate to the current user's role. */
-export function Nav({ name, role, admin = false }: { name: string; role?: string; admin?: boolean }) {
+export function Nav({
+  name,
+  role,
+  admin = false,
+}: {
+  name: string;
+  role?: string;
+  admin?: boolean;
+}) {
   const [open, setOpen] = useState(false);
-  const links = [{ href: "/dashboard", label: "Report an issue" }, { href: "/dashboard?tab=requests", label: "My requests" }, ...(admin ? [{ href: "/admin", label: "Admin dashboard" }] : [])];
-  return <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur"><div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"><Link href="/" className="flex min-h-11 items-center gap-2 text-xl font-bold text-primary"><span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground"><Shield size={20} /></span>Tatua</Link><nav className="hidden items-center gap-1 md:flex">{links.map((link) => <Link key={link.href} href={link.href} className="rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground">{link.label}</Link>)}</nav><div className="hidden items-center gap-3 md:flex"><ThemeToggle /><details className="relative"><summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg border bg-card px-3 text-sm font-semibold"><UserRound size={16} />{name}<span className="text-xs text-muted-foreground">({role ?? "citizen"})</span></summary><div className="absolute right-0 mt-2 w-56 rounded-xl border bg-popover p-3 shadow-xl"><p className="px-2 py-2 text-sm font-semibold">{name}</p><p className="px-2 pb-3 text-xs text-muted-foreground capitalize">{role ?? "citizen"} account</p><form action={signOut}><button className="min-h-11 w-full rounded-lg bg-secondary px-3 text-left text-sm font-semibold text-secondary-foreground hover:bg-accent">Sign out</button></form></div></details></div><button type="button" aria-label="Open navigation" onClick={() => setOpen(true)} className="grid min-h-11 min-w-11 place-items-center rounded-lg border md:hidden"><Menu /></button></div>{open && <div className="mobile-menu fixed inset-0 z-[1000] min-h-dvh overflow-y-auto bg-background p-5 text-foreground md:hidden"><div className="flex items-center justify-between"><Link href="/" onClick={() => setOpen(false)} className="text-xl font-bold text-primary">Tatua</Link><button type="button" aria-label="Close navigation" onClick={() => setOpen(false)} className="grid min-h-11 min-w-11 place-items-center rounded-lg border"><X /></button></div><nav className="mt-8 grid gap-2">{links.map((link) => <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="min-h-12 rounded-xl border bg-card px-4 py-3 text-base font-semibold hover:bg-accent">{link.label}</Link>)}</nav><div className="mt-8 flex items-center justify-between border-t pt-6"><span className="text-sm text-muted-foreground">{name} · {role ?? "citizen"}</span><ThemeToggle /></div><form action={signOut} className="mt-4"><button className="min-h-12 w-full rounded-xl bg-secondary text-left px-4 font-semibold text-secondary-foreground">Sign out</button></form></div>}</header>;
+  const links = [
+    { href: "/dashboard", label: "Report an issue" },
+    { href: "/dashboard?tab=requests", label: "My requests" },
+    ...(admin ? [{ href: "/admin", label: "Admin dashboard" }] : []),
+  ];
+  return (
+    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        <Link href="/" className="flex min-h-11 items-center gap-2 text-xl font-bold text-primary">
+          <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
+            <Shield size={20} />
+          </span>
+          Tatua
+        </Link>
+        <nav className="hidden items-center gap-1 md:flex">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle />
+          <details className="relative">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg border bg-card px-3 text-sm font-semibold">
+              <UserRound size={16} />
+              {name}
+              <span className="text-xs text-muted-foreground">({role ?? "citizen"})</span>
+            </summary>
+            <div className="absolute right-0 mt-2 w-56 rounded-xl border bg-popover p-3 shadow-xl">
+              <p className="px-2 py-2 text-sm font-semibold">{name}</p>
+              <p className="px-2 pb-3 text-xs text-muted-foreground capitalize">
+                {role ?? "citizen"} account
+              </p>
+              <form action={signOut}>
+                <button className="min-h-11 w-full rounded-lg bg-secondary px-3 text-left text-sm font-semibold text-secondary-foreground hover:bg-accent">
+                  Sign out
+                </button>
+              </form>
+            </div>
+          </details>
+        </div>
+        <button
+          type="button"
+          aria-label="Open navigation"
+          onClick={() => setOpen(true)}
+          className="grid min-h-11 min-w-11 place-items-center rounded-lg border md:hidden"
+        >
+          <Menu />
+        </button>
+      </div>
+      {open && (
+        <div className="mobile-menu fixed inset-0 z-[1000] min-h-dvh overflow-y-auto bg-background p-5 text-foreground md:hidden">
+          <div className="flex items-center justify-between">
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              className="text-xl font-bold text-primary"
+            >
+              Tatua
+            </Link>
+            <button
+              type="button"
+              aria-label="Close navigation"
+              onClick={() => setOpen(false)}
+              className="grid min-h-11 min-w-11 place-items-center rounded-lg border"
+            >
+              <X />
+            </button>
+          </div>
+          <nav className="mt-8 grid gap-2">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="min-h-12 rounded-xl border bg-card px-4 py-3 text-base font-semibold hover:bg-accent"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="mt-8 flex items-center justify-between border-t pt-6">
+            <span className="text-sm text-muted-foreground">
+              {name} · {role ?? "citizen"}
+            </span>
+            <ThemeToggle />
+          </div>
+          <form action={signOut} className="mt-4">
+            <button className="min-h-12 w-full rounded-xl bg-secondary text-left px-4 font-semibold text-secondary-foreground">
+              Sign out
+            </button>
+          </form>
+        </div>
+      )}
+    </header>
+  );
 }

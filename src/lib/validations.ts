@@ -1,14 +1,7 @@
 // Runtime schemas shared by server actions and browser form constraints.
 import { z } from "zod";
 
-export const categories = [
-  "streetlight",
-  "water",
-  "garbage",
-  "roads",
-  "sewage",
-  "other",
-] as const;
+export const categories = ["streetlight", "water", "garbage", "roads", "sewage", "other"] as const;
 
 // Keep these values aligned with the Postgres enum and the status badge labels.
 export const statuses = ["pending", "in_progress", "resolved", "rejected"] as const;
@@ -38,7 +31,10 @@ export const requestSchema = z.object({
 /** Input shape for administrator status updates. */
 export const statusUpdateSchema = z.object({
   requestId: z.string().uuid(),
-  status: z.preprocess((value) => value === "" ? null : value, z.enum(statuses).nullable().optional()),
+  status: z.preprocess(
+    (value) => (value === "" ? null : value),
+    z.enum(statuses).nullable().optional(),
+  ),
   note: z.string().trim().max(2000).optional(),
 });
 

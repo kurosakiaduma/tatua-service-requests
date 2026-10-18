@@ -19,12 +19,21 @@ export const categoryConfig: Record<Category, CategoryConfig> = {
 };
 
 /** Resolves a category to its accessible Lucide icon. */
-export function CategoryIcon({ category, size = 17, ...props }: { category: Category; size?: number } & Omit<LucideProps, "size">) {
+export function CategoryIcon({
+  category,
+  size = 17,
+  ...props
+}: { category: Category; size?: number } & Omit<LucideProps, "size">) {
   const Icon = categoryConfig[category].Icon;
   return <Icon size={size} aria-hidden="true" {...props} />;
 }
 
 /** Renders the category icon and human-readable label. */
 export function CategoryBadge({ category }: { category: Category }) {
-  return <span className="inline-flex items-center gap-2 font-semibold"><CategoryIcon category={category} /><span>{categoryConfig[category].label}</span></span>;
+  return (
+    <span className="inline-flex items-center gap-2 font-semibold">
+      <CategoryIcon category={category} />
+      <span>{categoryConfig[category].label}</span>
+    </span>
+  );
 }
