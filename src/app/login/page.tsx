@@ -61,6 +61,23 @@ export default async function Login({
             </label>
             <Submit label="Sign in" />
           </form>
+          <div className="mt-6 border-t pt-6">
+            <p className="text-sm font-semibold text-card-foreground">Reviewing this project?</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {[
+                { label: "Try the admin demo", email: "admin@tatua.demo" },
+                { label: "Try the citizen demo", email: "citizen@tatua.demo" },
+              ].map((demo) => (
+                <form key={demo.email} action={signIn}>
+                  <input type="hidden" name="email" value={demo.email} />
+                  <input type="hidden" name="password" value="TatuaDemo123!" />
+                  <button className="min-h-12 w-full rounded-xl border px-3 text-sm font-semibold text-foreground hover:bg-muted">
+                    {demo.label}
+                  </button>
+                </form>
+              ))}
+            </div>
+          </div>
           <p className="mt-7 text-sm text-muted-foreground">
             New to Tatua?{" "}
             <Link className="font-bold text-primary hover:underline" href="/register">

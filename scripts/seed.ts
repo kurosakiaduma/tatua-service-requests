@@ -1,3 +1,4 @@
+// Seeds Tatua demo users and sample requests; idempotent for demo users.
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../src/lib/database.types";
@@ -187,15 +188,13 @@ async function main() {
       .eq("note", note)
       .maybeSingle();
     if (!history) {
-      const historyResult = await supabase
-        .from("status_history")
-        .insert({
-          request_id: request.id,
-          status: sample.status,
-          changed_by: ids["admin@tatua.demo"],
-          note,
-          created_at: sample.updated_at,
-        });
+      const historyResult = await supabase.from("status_history").insert({
+        request_id: request.id,
+        status: sample.status,
+        changed_by: ids["admin@tatua.demo"],
+        note,
+        created_at: sample.updated_at,
+      });
       if (historyResult.error) throw historyResult.error;
     }
   }
@@ -234,14 +233,12 @@ async function main() {
     .eq("note", linkNote)
     .maybeSingle();
   if (!linkHistory) {
-    const { error } = await supabase
-      .from("status_history")
-      .insert({
-        request_id: duplicate.id,
-        status: original.status,
-        changed_by: ids["admin@tatua.demo"],
-        note: linkNote,
-      });
+    const { error } = await supabase.from("status_history").insert({
+      request_id: duplicate.id,
+      status: original.status,
+      changed_by: ids["admin@tatua.demo"],
+      note: linkNote,
+    });
     if (error) throw error;
   }
   const originalNotes = [
@@ -256,14 +253,12 @@ async function main() {
       .eq("note", note)
       .maybeSingle();
     if (!existingNote) {
-      const { error } = await supabase
-        .from("status_history")
-        .insert({
-          request_id: original.id,
-          status: original.status,
-          changed_by: ids["admin@tatua.demo"],
-          note,
-        });
+      const { error } = await supabase.from("status_history").insert({
+        request_id: original.id,
+        status: original.status,
+        changed_by: ids["admin@tatua.demo"],
+        note,
+      });
       if (error) throw error;
     }
   }
