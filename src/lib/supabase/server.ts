@@ -13,6 +13,11 @@ export async function createServerSupabaseClient() {
   }
 
   return createServerClient(url, key, {
+    global: {
+      // Supabase reads data with GET requests; opt out of Next.js fetch caching so
+      // request images and statuses reflect the latest database state per view.
+      fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();

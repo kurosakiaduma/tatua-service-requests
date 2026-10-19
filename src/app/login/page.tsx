@@ -4,6 +4,7 @@ import { signIn } from "@/app/actions";
 import { Submit } from "@/app/auth-form";
 import { Hero } from "@/app/hero";
 import { ThemeToggle } from "@/app/theme-toggle";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // Server-rendered sign-in page that forwards authentication to a server action.
@@ -79,9 +80,12 @@ export default async function Login({
                 <form key={demo.email} action={signIn}>
                   <input type="hidden" name="email" value={demo.email} />
                   <input type="hidden" name="password" value="TatuaDemo123!" />
-                  <button className="min-h-12 w-full rounded-xl border px-3 text-sm font-semibold text-foreground hover:bg-muted">
-                    {demo.label}
-                  </button>
+                  <SubmitButton
+                    label={demo.label}
+                    pendingLabel="Signing in…"
+                    variant="outline"
+                    className="w-full"
+                  />
                 </form>
               ))}
             </div>

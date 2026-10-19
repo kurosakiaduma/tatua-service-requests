@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Nav } from "@/app/nav";
 import { Hero } from "@/app/hero";
 import { AdminTabs } from "@/app/admin-tabs";
+import { externalImageUrl } from "@/lib/request-image";
 
 // Administrator dashboard guarded by both the profile role and database RLS.
 export const instant = false;
@@ -63,9 +64,8 @@ export default async function Admin({
   const requestsWithImages = await Promise.all(
     (requests ?? []).map(async (request) => {
       if (!request.image_path) return { ...request, image_url: null };
-      if (/^https?:\/\//i.test(request.image_path)) {
-        return { ...request, image_url: request.image_path };
-      }
+      const externalUrl = externalImageUrl(request.image_path);
+      if (externalUrl) return { ...request, image_url: externalUrl };
       const { data } = await supabase.storage
         .from("request-images")
         .createSignedUrl(request.image_path, 3600);

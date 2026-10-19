@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription } from "@/components/ui/dialog
 import { SubmitButton } from "@/components/ui/submit-button";
 import type { ServiceRequest, StatusHistory } from "@/lib/types";
 import { CategoryBadge } from "@/lib/categories";
+import { externalImageUrl } from "@/lib/request-image";
 
 type RequestWithImage = ServiceRequest & { image_url?: string | null };
 type Props = { requests: RequestWithImage[]; history: StatusHistory[]; updated?: boolean };
@@ -259,24 +260,30 @@ function Detail({
   const original = request.duplicate_of
     ? requests.find((candidate) => candidate.id === request.duplicate_of)
     : null;
-  const image = request.image_url
+  const imageUrl = request.image_url ?? externalImageUrl(request.image_path);
+  const image = imageUrl
     ? {
-        url: request.image_url,
+        url: imageUrl,
         reference: request.reference,
         category: request.category,
         createdAt: request.created_at,
         alt: `Photo uploaded for ${request.reference}, ${request.category} request at ${request.location}`,
       }
     : null;
-  const linkedImages = linkedReports
-    .filter((candidate) => candidate.image_url)
-    .map((candidate) => ({
-      url: candidate.image_url!,
-      reference: candidate.reference,
-      category: candidate.category,
-      createdAt: candidate.created_at,
-      alt: `Photo uploaded for linked report ${candidate.reference}`,
-    }));
+  const linkedImages = linkedReports.flatMap((candidate) => {
+    const url = candidate.image_url ?? externalImageUrl(candidate.image_path);
+    return url
+      ? [
+          {
+            url,
+            reference: candidate.reference,
+            category: candidate.category,
+            createdAt: candidate.created_at,
+            alt: `Photo uploaded for linked report ${candidate.reference}`,
+          },
+        ]
+      : [];
+  });
   return (
     <Dialog open>
       <DialogContent
@@ -364,38 +371,35 @@ function Detail({
             </h3>
             {linkedReports.length ? (
               <div className="mt-4 space-y-3">
-                {linkedReports.map((linked) => (
-                  <div key={linked.id} className="rounded-xl border p-3">
-                    <p className="font-mono text-xs font-bold text-primary">{linked.reference}</p>
-                    <p className="mt-1 text-sm">{linked.description}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Submitted {new Date(linked.created_at).toLocaleDateString()}
-                      {distanceBetween(request, linked) === null
-                        ? ""
-                        : ` · ${distanceBetween(request, linked)} from original pin`}
-                    </p>
-                    {linked.image_url && (
-                      <ImageThumbnail
-                        item={
-                          linkedImages.find(
-                            (candidate) => candidate.reference === linked.reference,
-                          ) ?? linkedImages[0]
-                        }
-                        items={linkedImages}
-                        className="mt-2"
-                      />
-                    )}
-                    <form action={unlinkRequest} className="mt-2">
-                      <input type="hidden" name="reportId" value={linked.id} />
-                      <SubmitButton
-                        label="Unlink"
-                        pendingLabel="Unlinking…"
-                        variant="destructive-outline"
-                        className="inline-flex items-center gap-1 text-sm"
-                      />
-                    </form>
-                  </div>
-                ))}
+                {linkedReports.map((linked) => {
+                  const linkedImage = linkedImages.find(
+                    (candidate) => candidate.reference === linked.reference,
+                  );
+                  return (
+                    <div key={linked.id} className="rounded-xl border p-3">
+                      <p className="font-mono text-xs font-bold text-primary">{linked.reference}</p>
+                      <p className="mt-1 text-sm">{linked.description}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Submitted {new Date(linked.created_at).toLocaleDateString()}
+                        {distanceBetween(request, linked) === null
+                          ? ""
+                          : ` · ${distanceBetween(request, linked)} from original pin`}
+                      </p>
+                      {linkedImage && (
+                        <ImageThumbnail item={linkedImage} items={linkedImages} className="mt-2" />
+                      )}
+                      <form action={unlinkRequest} className="mt-2">
+                        <input type="hidden" name="reportId" value={linked.id} />
+                        <SubmitButton
+                          label="Unlink"
+                          pendingLabel="Unlinking…"
+                          variant="destructive-outline"
+                          className="inline-flex items-center gap-1 text-sm"
+                        />
+                      </form>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="mt-2 text-sm text-muted-foreground">No linked reports yet.</p>

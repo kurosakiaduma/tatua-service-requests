@@ -17,6 +17,7 @@ import { MapPreview } from "@/app/map";
 import { Dialog, DialogContent, DialogDescription } from "@/components/ui/dialog";
 import type { LinkedOriginalContext, ServiceRequest, StatusHistory } from "@/lib/types";
 import { CategoryBadge, categoryConfig } from "@/lib/categories";
+import { externalImageUrl } from "@/lib/request-image";
 
 type RequestWithImage = ServiceRequest & { image_url?: string | null };
 
@@ -185,9 +186,10 @@ function CitizenDetail({
   original: LinkedOriginalContext | null;
   onClose: () => void;
 }) {
-  const image = request.image_url
+  const imageUrl = request.image_url ?? externalImageUrl(request.image_path);
+  const image = imageUrl
     ? {
-        url: request.image_url,
+        url: imageUrl,
         reference: request.reference,
         category: categoryConfig[request.category].label,
         createdAt: request.created_at,

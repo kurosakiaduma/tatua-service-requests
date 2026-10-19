@@ -4,6 +4,7 @@ import { Nav } from "@/app/nav";
 import { Hero } from "@/app/hero";
 import { CitizenTabs } from "@/app/citizen-tabs";
 import type { LinkedOriginalContext } from "@/lib/types";
+import { externalImageUrl } from "@/lib/request-image";
 
 // Citizen dashboard that loads only the signed-in user's reports and safe context.
 export const instant = false;
@@ -41,9 +42,8 @@ export default async function Dashboard({
   const requestsWithImages = await Promise.all(
     (requests ?? []).map(async (request) => {
       if (!request.image_path) return { ...request, image_url: null };
-      if (/^https?:\/\//i.test(request.image_path)) {
-        return { ...request, image_url: request.image_path };
-      }
+      const externalUrl = externalImageUrl(request.image_path);
+      if (externalUrl) return { ...request, image_url: externalUrl };
       const { data } = await supabase.storage
         .from("request-images")
         .createSignedUrl(request.image_path, 3600);
