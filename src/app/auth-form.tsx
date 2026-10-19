@@ -8,7 +8,7 @@ function SubmitButton({ label }: { label: string }) {
   return (
     <button
       disabled={pending}
-      className="min-h-12 w-full rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+      className="min-h-12 w-full rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60 cursor-pointer"
     >
       {pending ? "Working..." : label}
     </button>

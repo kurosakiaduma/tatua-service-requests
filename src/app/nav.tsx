@@ -37,7 +37,7 @@ export function Nav({
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              className="cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             >
               {link.label}
             </Link>
@@ -57,7 +57,7 @@ export function Nav({
                 {role ?? "citizen"} account
               </p>
               <form action={signOut}>
-                <button className="min-h-11 w-full rounded-lg bg-secondary px-3 text-left text-sm font-semibold text-secondary-foreground hover:bg-accent">
+                <button className="cursor-pointer min-h-11 w-full rounded-lg bg-secondary px-3 text-left text-sm font-semibold text-secondary-foreground hover:bg-accent">
                   Sign out
                 </button>
               </form>
@@ -98,7 +98,7 @@ export function Nav({
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="min-h-12 rounded-xl border bg-card px-4 py-3 text-base font-semibold hover:bg-accent"
+                className="cursor-pointer min-h-12 rounded-xl border bg-card px-4 py-3 text-base font-semibold hover:bg-accent"
               >
                 {link.label}
               </Link>

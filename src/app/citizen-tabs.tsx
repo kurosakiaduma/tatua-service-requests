@@ -48,7 +48,7 @@ export function CitizenTabs({
           role="tab"
           aria-selected={active === "new"}
           onClick={() => select("new")}
-          className={`min-h-12 shrink-0 snap-start rounded-lg px-5 text-sm font-bold ${active === "new" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+          className={`cursor-pointer min-h-12 shrink-0 snap-start rounded-lg px-5 text-sm font-bold ${active === "new" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
         >
           <FilePlus2 className="mr-2 inline" size={17} />
           New request
@@ -57,7 +57,7 @@ export function CitizenTabs({
           role="tab"
           aria-selected={active === "requests"}
           onClick={() => select("requests")}
-          className={`min-h-12 shrink-0 snap-start rounded-lg px-5 text-sm font-bold ${active === "requests" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+          className={`cursor-pointer min-h-12 shrink-0 snap-start rounded-lg px-5 text-sm font-bold ${active === "requests" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
         >
           <Inbox className="mr-2 inline" size={17} />
           My requests{" "}
@@ -95,7 +95,7 @@ export function CitizenTabs({
                     key={request.id}
                     type="button"
                     onClick={() => setSelected(request)}
-                    className="rounded-xl border bg-background p-5 text-left hover:bg-accent/40"
+                    className="cursor-pointer rounded-xl border bg-background p-5 text-left hover:bg-accent/40"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>

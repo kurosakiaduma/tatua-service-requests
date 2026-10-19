@@ -161,7 +161,7 @@ export function AdminTabs({ requests, history, updated = false }: Props) {
                   key={request.id}
                   type="button"
                   onClick={() => setSelected(request)}
-                  className="grid w-full gap-3 p-5 text-left hover:bg-accent/50 md:grid-cols-[1fr_1.5fr_auto] md:items-center"
+                  className="cursor-pointer grid w-full gap-3 p-5 text-left hover:bg-accent/50 md:grid-cols-[1fr_1.5fr_auto] md:items-center"
                 >
                   <div>
                     <p className="font-mono text-xs font-bold text-primary">{request.reference}</p>
@@ -496,7 +496,7 @@ function Tab({
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`flex min-h-12 shrink-0 snap-start items-center rounded-lg px-5 text-sm font-bold ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+      className={`cursor-pointer flex min-h-12 shrink-0 snap-start items-center rounded-lg px-5 text-sm font-bold ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
     >
       {icon}
       <span className="ml-2">{children}</span>

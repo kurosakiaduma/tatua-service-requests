@@ -23,7 +23,7 @@ export function ThemeToggle() {
           aria-label={label as string}
           aria-pressed={theme === value}
           onClick={() => setTheme(value as string)}
-          className={`flex min-h-10 min-w-10 items-center justify-center rounded-md px-2 ${theme === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"}`}
+          className={`cursor-pointer flex min-h-10 min-w-10 items-center justify-center rounded-md px-2 ${theme === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"}`}
         >
           <Icon size={16} aria-hidden="true" />
         </button>

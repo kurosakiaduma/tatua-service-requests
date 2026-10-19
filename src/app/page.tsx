@@ -18,7 +18,10 @@ export default function Home() {
     <main className="min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-xl font-bold text-primary cursor-pointer"
+          >
             <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
               <ShieldCheck size={20} />
             </span>
@@ -27,13 +30,13 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="min-h-11 rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-accent"
+              className="min-h-11 rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-accent cursor-pointer"
             >
               Sign in
             </Link>
             <Link
               href="/register"
-              className="min-h-11 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="min-h-11 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 cursor-pointer"
             >
               Get started
             </Link>
@@ -85,7 +88,7 @@ export default function Home() {
           </div>
           <Link
             href="/register"
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-card px-5 font-bold text-card-foreground hover:opacity-90"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-card px-5 font-bold text-card-foreground hover:opacity-90 cursor-pointer"
           >
             Create an account <ArrowRight size={18} />
           </Link>

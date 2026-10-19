@@ -23,7 +23,7 @@ export function DialogContent({
         {children}
         <DialogPrimitive.Close
           aria-label="Close"
-          className="absolute right-4 top-4 rounded-lg p-2 hover:bg-accent"
+          className="absolute right-4 top-4 rounded-lg p-2 hover:bg-accent cursor-pointer"
         >
           <X size={18} />
         </DialogPrimitive.Close>
