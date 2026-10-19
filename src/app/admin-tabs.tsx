@@ -292,7 +292,7 @@ function Detail({
           <button
             type="button"
             onClick={onClose}
-            className="min-h-11 rounded-lg border px-3 text-sm font-bold"
+            className="cursor-pointer min-h-11 rounded-lg border px-3 text-sm font-bold"
           >
             Close
           </button>

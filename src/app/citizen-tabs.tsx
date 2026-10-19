@@ -205,7 +205,11 @@ function CitizenDetail({
             <p className="font-mono text-xs font-bold text-primary">{request.reference}</p>
             <CategoryBadge category={request.category} />
           </div>
-          <button type="button" onClick={onClose} className="min-h-11 rounded-lg border px-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="cursor-pointer min-h-11 rounded-lg border px-3"
+          >
             Close
           </button>
         </div>
