@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { ArrowRight, CheckCircle2, FileText, Search, ShieldCheck } from "lucide-react";
 import { Hero } from "@/app/hero";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const categories = [
   "Streetlights",
@@ -13,7 +15,13 @@ const categories = [
 ];
 
 /** Renders the public landing page explaining Tatua and guiding visitors to authentication. */
-export default function Home() {
+export default async function Home() {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) redirect("/dashboard");
+
   return (
     <main className="min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">

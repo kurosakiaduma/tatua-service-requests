@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { signIn } from "@/app/actions";
 import { Submit } from "@/app/auth-form";
 import { Hero } from "@/app/hero";
 import { ThemeToggle } from "@/app/theme-toggle";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // Server-rendered sign-in page that forwards authentication to a server action.
 export const instant = false;
@@ -12,6 +14,12 @@ export default async function Login({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) redirect("/dashboard");
+
   const params = await searchParams;
   return (
     <main className="relative min-h-screen bg-background">

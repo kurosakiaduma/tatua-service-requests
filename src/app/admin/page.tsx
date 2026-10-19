@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Nav } from "@/app/nav";
 import { Hero } from "@/app/hero";
@@ -37,6 +38,15 @@ export default async function Admin({
         <h1 className="text-2xl font-bold text-foreground">Admin access required</h1>
         <p className="mt-2 text-muted-foreground">
           This area is restricted to authorized Tatua administrators.
+        </p>
+        <p className="mt-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 cursor-pointer"
+          >
+            <ArrowLeft size={16} />
+            Back to home
+          </Link>
         </p>
       </main>
     );
