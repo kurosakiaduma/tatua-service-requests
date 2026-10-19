@@ -69,12 +69,14 @@ export function ImageThumbnail({
         zIndex={1100}
         className="flex max-h-[95vh] max-w-6xl flex-col items-center bg-foreground/95 p-4 text-background"
       >
-        <DialogClose
-          aria-label="Close image"
-          className="absolute right-4 top-4 z-10 grid size-10 cursor-pointer place-items-center rounded-full bg-background/20 text-background transition hover:bg-background/40"
-        >
-          <X size={18} />
-        </DialogClose>
+        <div className="flex w-full shrink-0 items-center justify-end pb-3">
+          <DialogClose
+            aria-label="Close image"
+            className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-full border border-background/30 bg-background/30 text-background transition hover:bg-background/50"
+          >
+            <X size={18} />
+          </DialogClose>
+        </div>
         <DialogTitle className="sr-only">Image for {item.reference}</DialogTitle>
         <DialogDescription className="sr-only">{item.alt}</DialogDescription>
         <div

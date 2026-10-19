@@ -79,22 +79,25 @@ export function RequestForm({ action }: { action: (formData: FormData) => void }
     >
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block text-sm font-semibold text-card-foreground">
-          <span className="inline-flex items-center gap-2">
-            <CategoryIcon category={category} />
-            {categoryConfig[category].label}
+          Category
+          <span className="relative mt-2 block">
+            <CategoryIcon
+              category={category}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
+            <select
+              name="category"
+              value={category}
+              onChange={(event) => setCategory(event.target.value as (typeof categories)[number])}
+              className="min-h-12 w-full rounded-lg border bg-background pl-10 pr-3 text-foreground"
+            >
+              {categories.map((value) => (
+                <option key={value} value={value}>
+                  {categoryConfig[value].label}
+                </option>
+              ))}
+            </select>
           </span>
-          <select
-            name="category"
-            value={category}
-            onChange={(event) => setCategory(event.target.value as (typeof categories)[number])}
-            className="mt-2 min-h-12 w-full rounded-lg border bg-background px-3 text-foreground"
-          >
-            {categories.map((value) => (
-              <option key={value} value={value}>
-                {categoryConfig[value].label}
-              </option>
-            ))}
-          </select>
         </label>
         <label className="block text-sm font-semibold text-card-foreground">
           Location
