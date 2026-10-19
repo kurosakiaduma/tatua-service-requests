@@ -7,6 +7,7 @@
 // redirects all land on the right tab.
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { FilePlus2, Inbox, Upload } from "lucide-react";
 import { RequestForm } from "@/app/request-form";
@@ -34,7 +35,10 @@ export function CitizenTabs({
   // history.pushState update the URL; this component simply reads it.
   const active =
     params.get("tab") === "requests" || params.get("created") === "1" ? "requests" : "new";
-  const [selected, setSelected] = useState<RequestWithImage | null>(null);
+  const [active, setActive] = useState(initialActive);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = requests.find((request) => request.id === selectedId) ?? null;
+
   useEffect(() => {
     if (params.get("created") === "1")
       toast.success("Request submitted", {
@@ -73,87 +77,93 @@ export function CitizenTabs({
           </span>
         </button>
       </div>
-      {active === "new" ? (
-        <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground">
-              <Upload size={18} />
+      <div
+        className={`transition-opacity duration-150 ${active === "new" ? "opacity-100" : "opacity-0"}`}
+      >
+        {active === "new" ? (
+          <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground">
+                <Upload size={18} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-card-foreground">New request</h2>
+                <p className="text-sm text-muted-foreground">
+                  Give the service team enough detail to act.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-card-foreground">New request</h2>
-              <p className="text-sm text-muted-foreground">
-                Give the service team enough detail to act.
-              </p>
-            </div>
-          </div>
-          <RequestForm action={createRequest} />
-        </section>
-      ) : (
-        <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
-          <h2 className="text-xl font-bold text-card-foreground">My requests</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{requests.length} submitted</p>
-          {requests.length ? (
-            <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              {requests.map((request) => {
-                const latest = history.filter((event) => event.request_id === request.id).at(-1);
-                const original = request.duplicate_of ? originalContexts[request.id] : null;
-                return (
-                  <button
-                    key={request.id}
-                    type="button"
-                    onClick={() => setSelected(request)}
-                    className="rounded-xl border bg-background p-5 text-left hover:bg-accent/40"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <p className="font-mono text-xs font-bold text-primary">
-                          {request.reference}
-                        </p>
-                        <CategoryBadge category={request.category} />
-                        <p className="mt-1 text-sm text-muted-foreground">{request.location}</p>
+            <RequestForm action={createRequest} />
+          </section>
+        ) : (
+          <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
+            <h2 className="text-xl font-bold text-card-foreground">My requests</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{requests.length} submitted</p>
+            {requests.length ? (
+              <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                {requests.map((request) => {
+                  const latest = history.filter((event) => event.request_id === request.id).at(-1);
+                  const original = request.duplicate_of ? originalContexts[request.id] : null;
+                  return (
+                    <button
+                      key={request.id}
+                      type="button"
+                      onClick={() => setSelectedId(request.id)}
+                      className="rounded-xl border bg-background p-5 text-left hover:bg-accent/40"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="font-mono text-xs font-bold text-primary">
+                            {request.reference}
+                          </p>
+                          <CategoryBadge category={request.category} />
+                          <p className="mt-1 text-sm text-muted-foreground">{request.location}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <StatusBadge
+                            status={
+                              request.duplicate_of && original ? original.status : request.status
+                            }
+                          />
+                          {original && (
+                            <span className="rounded-full bg-secondary px-2 py-1 text-xs font-semibold">
+                              Linked to {original.reference}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        <StatusBadge
-                          status={
-                            request.duplicate_of && original ? original.status : request.status
-                          }
-                        />
-                        {original && (
-                          <span className="rounded-full bg-secondary px-2 py-1 text-xs font-semibold">
-                            Linked to {original.reference}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <p className="mt-4 text-sm leading-6 text-foreground">{request.description}</p>
-                    <p className="mt-4 text-xs text-muted-foreground">
-                      Submitted {new Date(request.created_at).toLocaleString()} · Updated{" "}
-                      {new Date(latest?.created_at ?? request.updated_at).toLocaleDateString()}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="mt-6 rounded-xl border border-dashed p-8 text-center">
-              <Inbox className="mx-auto text-muted-foreground" />
-              <p className="mt-3 font-semibold text-foreground">No requests yet</p>
-              <button
-                onClick={() => select("new")}
-                className="mt-3 font-bold text-primary hover:underline"
-              >
-                Submit your first request
-              </button>
-            </div>
-          )}
-        </section>
-      )}
+                      <p className="mt-4 text-sm leading-6 text-foreground">
+                        {request.description}
+                      </p>
+                      <p className="mt-4 text-xs text-muted-foreground">
+                        Submitted {new Date(request.created_at).toLocaleString()} · Updated{" "}
+                        {new Date(latest?.created_at ?? request.updated_at).toLocaleDateString()}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-6 rounded-xl border border-dashed p-8 text-center">
+                <Inbox className="mx-auto text-muted-foreground" />
+                <p className="mt-3 font-semibold text-foreground">No requests yet</p>
+                <button
+                  onClick={() => select("new")}
+                  className="mt-3 font-bold text-primary hover:underline"
+                >
+                  Submit your first request
+                </button>
+              </div>
+            )}
+          </section>
+        )}
+      </div>
       {selected && (
         <CitizenDetail
           request={selected}
           history={history}
           original={selected.duplicate_of ? originalContexts[selected.id] : null}
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedId(null)}
         />
       )}
     </div>

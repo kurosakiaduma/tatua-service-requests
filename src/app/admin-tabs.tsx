@@ -23,7 +23,8 @@ export function AdminTabs({ requests, history, updated = false }: Props) {
   const [status, setStatus] = useState("all");
   const [category, setCategory] = useState("all");
   const [showLinked, setShowLinked] = useState(false);
-  const [selected, setSelected] = useState<RequestWithImage | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = requests.find((request) => request.id === selectedId) ?? null;
   useEffect(() => {
     if (updated)
       toast.success("Request updated", { description: "The timeline and reports are refreshed." });
@@ -161,7 +162,7 @@ export function AdminTabs({ requests, history, updated = false }: Props) {
                 <button
                   key={request.id}
                   type="button"
-                  onClick={() => setSelected(request)}
+                  onClick={() => setSelectedId(request.id)}
                   className="grid w-full gap-3 p-5 text-left hover:bg-accent/50 md:grid-cols-[1fr_1.5fr_auto] md:items-center"
                 >
                   <div>
@@ -230,7 +231,7 @@ export function AdminTabs({ requests, history, updated = false }: Props) {
           requests={requests}
           history={history}
           originals={originals}
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedId(null)}
           update={update}
         />
       )}

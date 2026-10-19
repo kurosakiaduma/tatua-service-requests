@@ -2,6 +2,7 @@
 
 // Authenticated navigation with responsive links, account actions, and theme control.
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, Shield, UserRound, X } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "@/app/actions";
@@ -18,12 +19,19 @@ export function Nav({
   role?: string;
   admin?: boolean;
 }) {
+  const pathname = usePathname();
+  const isDashboard = pathname === "/dashboard";
   const [open, setOpen] = useState(false);
-  const links = [
-    { href: "/dashboard", label: "Report an issue" },
-    { href: "/dashboard?tab=requests", label: "My requests" },
+  const links: NavLink[] = [
+    { href: "/dashboard", label: "Report an issue", tab: "new" },
+    { href: "/dashboard?tab=requests", label: "My requests", tab: "requests" },
     ...(admin ? [{ href: "/admin", label: "Admin dashboard" }] : []),
   ];
+
+  const goToTab = (tab: string) => {
+    window.history.pushState(null, "", `/dashboard?tab=${tab}`);
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
       <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
@@ -35,13 +43,13 @@ export function Nav({
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
           {links.map((link) => (
-            <Link
+            <NavLinkItem
               key={link.href}
-              href={link.href}
+              link={link}
+              isDashboard={isDashboard}
+              goToTab={goToTab}
               className="rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              {link.label}
-            </Link>
+            />
           ))}
         </nav>
         <div className="hidden items-center gap-3 md:flex">
@@ -98,14 +106,13 @@ export function Nav({
           </div>
           <nav className="mt-8 grid gap-2">
             {links.map((link) => (
-              <Link
+              <NavLinkItem
                 key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="min-h-12 rounded-xl border bg-card px-4 py-3 text-base font-semibold hover:bg-accent"
-              >
-                {link.label}
-              </Link>
+                link={link}
+                isDashboard={isDashboard}
+                goToTab={goToTab}
+                className="min-h-12 rounded-xl border bg-card px-4 py-3 text-base font-semibold hover:bg-accent block"
+              />
             ))}
           </nav>
           <div className="mt-8 flex items-center justify-between border-t pt-6">
@@ -125,5 +132,37 @@ export function Nav({
         </div>
       )}
     </header>
+  );
+}
+
+function NavLinkItem({
+  link,
+  isDashboard,
+  goToTab,
+  className,
+}: {
+  link: NavLink;
+  isDashboard: boolean;
+  goToTab: (tab: string) => void;
+  className: string;
+}) {
+  // On the dashboard these links switch tabs instantly without a server round trip.
+  // Elsewhere they remain normal navigations.
+  if (isDashboard && link.tab) {
+    return (
+      <button
+        type="button"
+        onClick={() => goToTab(link.tab!)}
+        className={`${className} w-full text-left`}
+      >
+        {link.label}
+      </button>
+    );
+  }
+  return (
+    <Link href={link.href} className={className}>
+      {link.label}
+      <LinkPendingIndicator />
+    </Link>
   );
 }

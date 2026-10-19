@@ -2,6 +2,7 @@
 
 // Client-only Plotly analytics for primary requests and their recent status trends.
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";

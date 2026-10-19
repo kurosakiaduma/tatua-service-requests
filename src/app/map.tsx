@@ -2,6 +2,7 @@
 
 // Leaflet controls for selecting, reverse-geocoding, and previewing locations.
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import { LocateFixed, Maximize2, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CircleMarker, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
@@ -276,7 +277,9 @@ export function MapPicker({
           </button>
         </div>
         <div className="h-64 overflow-hidden rounded-xl border">
-          <MapCanvas value={value} onChange={pinChanged} />
+          <Suspense fallback={<Skeleton height={256} className="w-full" />}>
+            <MapCanvas value={value} onChange={pinChanged} />
+          </Suspense>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -388,16 +391,18 @@ export function MapPicker({
             </button>
           </div>
           <div className="min-h-[16rem] flex-1 overflow-hidden rounded-xl border">
-            <MapCanvas
-              value={draftValue}
-              onChange={(next) => {
-                setDraftValue(next);
-                void reverseGeocode(next)
-                  .then(setDraftText)
-                  .catch(() => undefined);
-              }}
-              zoom={13}
-            />
+            <Suspense fallback={<Skeleton height={256} className="w-full" />}>
+              <MapCanvas
+                value={draftValue}
+                onChange={(next) => {
+                  setDraftValue(next);
+                  void reverseGeocode(next)
+                    .then(setDraftText)
+                    .catch(() => undefined);
+                }}
+                zoom={13}
+              />
+            </Suspense>
           </div>
           <div className="mt-3 flex shrink-0 flex-wrap justify-end gap-2">
             <button
