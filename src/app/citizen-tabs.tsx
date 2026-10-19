@@ -195,7 +195,7 @@ function CitizenDetail({
       }
     : null;
   return (
-    <Dialog>
+    <Dialog open>
       <DialogContent className="flex flex-col max-h-[90vh] max-w-[90vw] w-full sm:max-w-lg bg-card p-6 shadow-2xl">
         <DialogDescription className="sr-only">
           Request details for {request.reference}
