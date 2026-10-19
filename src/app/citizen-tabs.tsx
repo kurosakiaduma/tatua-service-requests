@@ -30,12 +30,21 @@ export function CitizenTabs({
   originalContexts: Record<string, LinkedOriginalContext | null>;
 }) {
   const params = useSearchParams();
-  // Derive the active tab from the URL on every render. Nav links and
-  // history.pushState update the URL; this component simply reads it.
-  const active =
+  // Derive the active tab from the URL on every render so deep links,
+  // browser back/forward, and the post-submit redirect all land on the
+  // right tab. A local state mirror is kept in sync so that tab clicks
+  // (which use history.pushState) re-render immediately.
+  const urlActive =
     params.get("tab") === "requests" || params.get("created") === "1" ? "requests" : "new";
+  const [active, setActive] = useState(urlActive);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = requests.find((request) => request.id === selectedId) ?? null;
+
+  // Keep the local active tab in sync with the URL (e.g. back/forward navigation).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setActive(urlActive);
+  }, [urlActive]);
 
   useEffect(() => {
     if (params.get("created") === "1")
@@ -45,6 +54,7 @@ export function CitizenTabs({
   }, [params]);
   const select = (tab: string) => {
     window.history.pushState(null, "", `/dashboard?tab=${tab}`);
+    setActive(tab);
   };
   return (
     <div className="space-y-5">
