@@ -5,8 +5,16 @@ import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+const Plot260 = dynamic(() => import("react-plotly.js"), {
+  ssr: false,
+  loading: () => <Skeleton height={260} className="w-full" />,
+});
+const Plot280 = dynamic(() => import("react-plotly.js"), {
+  ssr: false,
+  loading: () => <Skeleton height={280} className="w-full" />,
+});
 const FALLBACK_COLORS = {
   text: "#102a2e",
   grid: "#cbdad8",
@@ -101,7 +109,7 @@ export function AdminCharts({
         title="Primary request outcomes"
         summary={`${open} open, ${resolved} resolved and ${rejected} rejected primary requests.`}
       >
-        <Plot
+        <Plot260
           data={[
             {
               values: [open, resolved, rejected],
@@ -122,7 +130,7 @@ export function AdminCharts({
         title="Most reported issues"
         summary={`${categories.map((category, index) => `${category}: ${categoryCounts[index]}`).join(", ")}.`}
       >
-        <Plot
+        <Plot260
           data={[
             {
               x: categories,
@@ -143,7 +151,7 @@ export function AdminCharts({
           title="Primary requests over the last 14 days"
           summary="A status split line chart for recent primary submissions."
         >
-          <Plot
+          <Plot280
             data={traces}
             layout={layout}
             config={{ responsive: true, displayModeBar: false }}

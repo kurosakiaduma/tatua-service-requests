@@ -13,13 +13,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { canReplaceLocationText, coordinatesFallback } from "@/lib/location-sync";
 import "leaflet/dist/leaflet.css";
 
 /** Default map center for Murang'a town when no pin has been selected. */
 export const MURANGA_CENTER: [number, number] = [-0.72, 37.15];
-const LeafletMap = dynamic(() => import("react-leaflet").then((module) => module.MapContainer), {
+const LeafletMap256 = dynamic(() => import("react-leaflet").then((module) => module.MapContainer), {
   ssr: false,
+  loading: () => <Skeleton height={256} className="w-full" />,
+});
+const LeafletMap192 = dynamic(() => import("react-leaflet").then((module) => module.MapContainer), {
+  ssr: false,
+  loading: () => <Skeleton height={192} className="w-full" />,
 });
 const reverseCache = new Map<string, string>();
 let lastGeocodeAt = 0;
@@ -155,7 +161,7 @@ function MapCanvas({
   zoom?: number;
 }) {
   return (
-    <LeafletMap
+    <LeafletMap256
       center={value ?? MURANGA_CENTER}
       zoom={zoom}
       scrollWheelZoom={false}
@@ -167,7 +173,7 @@ function MapCanvas({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapInteractions value={value} onChange={onChange} />
-    </LeafletMap>
+    </LeafletMap256>
   );
 }
 
@@ -427,7 +433,7 @@ export function MapPreview({
   const value: [number, number] = [latitude, longitude];
   return (
     <div className="mt-5 h-48 overflow-hidden rounded-xl border">
-      <LeafletMap center={value} zoom={15} scrollWheelZoom={false} className="h-full w-full">
+      <LeafletMap192 center={value} zoom={15} scrollWheelZoom={false} className="h-full w-full">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -437,7 +443,7 @@ export function MapPreview({
           radius={9}
           pathOptions={{ color: "#087f78", fillColor: "#5ed8ca", fillOpacity: 0.9 }}
         />
-      </LeafletMap>
+      </LeafletMap192>
       <a
         className="sr-only"
         href={`https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=18/${latitude}/${longitude}`}
