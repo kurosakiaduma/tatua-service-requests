@@ -276,7 +276,7 @@ export function MapPicker({
             Expand
           </button>
         </div>
-        <div className="h-64 overflow-hidden rounded-xl border">
+        <div className="h-64 isolate overflow-hidden rounded-xl border">
           <Suspense fallback={<Skeleton height={256} className="w-full" />}>
             <MapCanvas value={value} onChange={pinChanged} />
           </Suspense>
@@ -390,7 +390,7 @@ export function MapPicker({
               Find
             </button>
           </div>
-          <div className="min-h-[16rem] flex-1 overflow-hidden rounded-xl border">
+          <div className="min-h-[16rem] flex-1 isolate overflow-hidden rounded-xl border">
             <Suspense fallback={<Skeleton height={256} className="w-full" />}>
               <MapCanvas
                 value={draftValue}
@@ -437,7 +437,7 @@ export function MapPreview({
   if (latitude === null || longitude === null) return null;
   const value: [number, number] = [latitude, longitude];
   return (
-    <div className="mt-5 h-48 shrink-0 overflow-hidden rounded-xl border">
+    <div className="mt-5 h-48 shrink-0 isolate overflow-hidden rounded-xl border">
       <LeafletMap192 center={value} zoom={15} scrollWheelZoom={false} className="h-full w-full">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

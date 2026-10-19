@@ -339,6 +339,10 @@ The daily cron is configured in [vercel.json](./vercel.json).
 | ----------------------------------------------------------------------------------- |
 | ![Citizen request details](./public/images/screenshots/citizen_request_details.png) |
 
+| Request image lightbox                                                    |
+| ------------------------------------------------------------------------- |
+| ![Request image lightbox](./public/images/screenshots/image-lightbox.png) |
+
 ### Admin experience
 
 | Admin landing page                                                   | Admin requests                                                         |
