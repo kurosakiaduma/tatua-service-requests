@@ -13,9 +13,10 @@ import { RequestForm } from "@/app/request-form";
 import { StatusBadge } from "@/app/status-badge";
 import { createRequest } from "@/app/actions";
 import { ImageThumbnail } from "@/app/image-lightbox";
+import { MapPreview } from "@/app/map";
+import { Dialog, DialogContent, DialogDescription } from "@/components/ui/dialog";
 import type { LinkedOriginalContext, ServiceRequest, StatusHistory } from "@/lib/types";
 import { CategoryBadge, categoryConfig } from "@/lib/categories";
-import { MapPreview } from "@/app/map";
 
 type RequestWithImage = ServiceRequest & { image_url?: string | null };
 
@@ -194,16 +195,11 @@ function CitizenDetail({
       }
     : null;
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex justify-end bg-foreground/40"
-      onClick={onClose}
-    >
-      <aside
-        className="h-full w-full max-w-xl overflow-y-auto border-l bg-card p-6"
-        onClick={(event) => event.stopPropagation()}
-      >
+    <Dialog>
+      <DialogContent className="flex flex-col max-h-[90vh] max-w-[90vw] w-full sm:max-w-lg bg-card p-6 shadow-2xl">
+        <DialogDescription className="sr-only">
+          Request details for {request.reference}
+        </DialogDescription>
         <div className="flex items-start justify-between">
           <div>
             <p className="font-mono text-xs font-bold text-primary">{request.reference}</p>
@@ -261,7 +257,7 @@ function CitizenDetail({
               </div>
             ))}
         </div>
-      </aside>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

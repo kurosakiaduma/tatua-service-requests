@@ -9,6 +9,7 @@ import { ImageThumbnail } from "@/app/image-lightbox";
 import { MapPreview } from "@/app/map";
 import { StatusBadge } from "@/app/status-badge";
 import { AdminCharts } from "@/app/charts";
+import { Dialog, DialogContent, DialogDescription } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/ui/submit-button";
 import type { ServiceRequest, StatusHistory } from "@/lib/types";
 import { CategoryBadge } from "@/lib/categories";
@@ -277,16 +278,11 @@ function Detail({
       alt: `Photo uploaded for linked report ${candidate.reference}`,
     }));
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex justify-end bg-foreground/40"
-      onClick={onClose}
-    >
-      <aside
-        className="h-full w-full max-w-xl overflow-y-auto border-l bg-card p-6 shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
+    <Dialog>
+      <DialogContent className="flex flex-col max-h-[90vh] max-w-[90vw] w-full sm:max-w-lg bg-card p-6 shadow-2xl">
+        <DialogDescription className="sr-only">
+          Request details for {request.reference}
+        </DialogDescription>
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-mono text-xs font-bold text-primary">{request.reference}</p>
@@ -471,8 +467,8 @@ function Detail({
               ))}
           </div>
         </section>
-      </aside>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

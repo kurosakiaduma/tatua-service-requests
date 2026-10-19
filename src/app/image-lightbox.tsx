@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Maximize2 } from "lucide-react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -64,6 +65,7 @@ export function ImageThumbnail({
         </button>
       </DialogTrigger>
       <DialogContent className="flex max-h-[95vh] max-w-6xl flex-col items-center bg-foreground/95 p-4 text-background">
+        <DialogClose className="absolute right-4 top-4 bg-foreground/20 rounded-full p-2 text-background hover:bg-foreground/40" />
         <DialogTitle className="sr-only">Image for {item.reference}</DialogTitle>
         <DialogDescription className="sr-only">{item.alt}</DialogDescription>
         <div
