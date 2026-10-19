@@ -7,7 +7,6 @@
 // redirects all land on the right tab.
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { FilePlus2, Inbox, Upload } from "lucide-react";
 import { RequestForm } from "@/app/request-form";
@@ -35,7 +34,6 @@ export function CitizenTabs({
   // history.pushState update the URL; this component simply reads it.
   const active =
     params.get("tab") === "requests" || params.get("created") === "1" ? "requests" : "new";
-  const [active, setActive] = useState(initialActive);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = requests.find((request) => request.id === selectedId) ?? null;
 

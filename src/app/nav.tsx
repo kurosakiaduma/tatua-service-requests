@@ -8,6 +8,7 @@ import { useState } from "react";
 import { signOut } from "@/app/actions";
 import { ThemeToggle } from "@/app/theme-toggle";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { LinkPendingIndicator } from "@/components/ui/link-pending";
 
 /** Renders navigation appropriate to the current user's role. */
 export function Nav({
@@ -22,11 +23,11 @@ export function Nav({
   const pathname = usePathname();
   const isDashboard = pathname === "/dashboard";
   const [open, setOpen] = useState(false);
-  const links: NavLink[] = [
+  const links = [
     { href: "/dashboard", label: "Report an issue", tab: "new" },
     { href: "/dashboard?tab=requests", label: "My requests", tab: "requests" },
     ...(admin ? [{ href: "/admin", label: "Admin dashboard" }] : []),
-  ];
+  ] as const;
 
   const goToTab = (tab: string) => {
     window.history.pushState(null, "", `/dashboard?tab=${tab}`);
@@ -141,7 +142,7 @@ function NavLinkItem({
   goToTab,
   className,
 }: {
-  link: NavLink;
+  link: { href: string; label: string; tab?: "new" | "requests" };
   isDashboard: boolean;
   goToTab: (tab: string) => void;
   className: string;
