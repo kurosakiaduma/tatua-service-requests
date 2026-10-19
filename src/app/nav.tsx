@@ -6,6 +6,7 @@ import { Menu, Shield, UserRound, X } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "@/app/actions";
 import { ThemeToggle } from "@/app/theme-toggle";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 /** Renders navigation appropriate to the current user's role. */
 export function Nav({
@@ -57,9 +58,12 @@ export function Nav({
                 {role ?? "citizen"} account
               </p>
               <form action={signOut}>
-                <button className="min-h-11 w-full rounded-lg bg-secondary px-3 text-left text-sm font-semibold text-secondary-foreground hover:bg-accent">
-                  Sign out
-                </button>
+                <SubmitButton
+                  label="Sign out"
+                  pendingLabel="Signing out…"
+                  variant="secondary"
+                  className="min-h-11 w-full px-3 text-left text-sm"
+                />
               </form>
             </div>
           </details>
@@ -111,9 +115,12 @@ export function Nav({
             <ThemeToggle />
           </div>
           <form action={signOut} className="mt-4">
-            <button className="min-h-12 w-full rounded-xl bg-secondary text-left px-4 font-semibold text-secondary-foreground">
-              Sign out
-            </button>
+            <SubmitButton
+              label="Sign out"
+              pendingLabel="Signing out…"
+              variant="secondary"
+              className="w-full rounded-xl text-left px-4"
+            />
           </form>
         </div>
       )}

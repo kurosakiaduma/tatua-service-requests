@@ -2,13 +2,14 @@
 
 // Administrator workspace for request triage, updates, linking, and activity review.
 import { useEffect, useMemo, useState } from "react";
-import { Activity, BarChart3, Link2, Search, SlidersHorizontal, Unlink } from "lucide-react";
+import { Activity, BarChart3, Link2, Search, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { linkRequest, unlinkRequest, updateRequestStatus } from "@/app/actions";
 import { ImageThumbnail } from "@/app/image-lightbox";
 import { MapPreview } from "@/app/map";
 import { StatusBadge } from "@/app/status-badge";
 import { AdminCharts } from "@/app/charts";
+import { SubmitButton } from "@/components/ui/submit-button";
 import type { ServiceRequest, StatusHistory } from "@/lib/types";
 import { CategoryBadge } from "@/lib/categories";
 
@@ -345,9 +346,11 @@ function Detail({
               <p className="text-xs text-muted-foreground">
                 Messages on this request are visible to everyone linked to it.
               </p>
-              <button className="min-h-11 rounded-lg bg-primary px-4 font-bold text-primary-foreground">
-                Post update
-              </button>
+              <SubmitButton
+                label="Post update"
+                variant="primary"
+                className="min-h-11 px-4 font-bold"
+              />
             </form>
           </>
         )}
@@ -384,10 +387,12 @@ function Detail({
                     )}
                     <form action={unlinkRequest} className="mt-2">
                       <input type="hidden" name="reportId" value={linked.id} />
-                      <button className="inline-flex items-center gap-1 text-sm font-bold text-destructive">
-                        <Unlink size={15} />
-                        Unlink
-                      </button>
+                      <SubmitButton
+                        label="Unlink"
+                        pendingLabel="Unlinking…"
+                        variant="destructive-outline"
+                        className="inline-flex items-center gap-1 text-sm"
+                      />
                     </form>
                   </div>
                 ))}
@@ -421,9 +426,12 @@ function Detail({
                   placeholder="Optional message"
                   className="min-h-11 w-full rounded-lg border bg-background px-3 py-3 text-foreground"
                 />
-                <button className="min-h-11 rounded-lg bg-primary px-4 font-bold text-primary-foreground">
-                  Link as duplicate
-                </button>
+                <SubmitButton
+                  label="Link as duplicate"
+                  pendingLabel="Linking…"
+                  variant="primary"
+                  className="min-h-11 px-4 font-bold"
+                />
               </form>
             </div>
           </section>
