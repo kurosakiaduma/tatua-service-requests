@@ -2,6 +2,7 @@
 
 // Leaflet controls for selecting, reverse-geocoding, and previewing locations.
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import { LocateFixed, Maximize2, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CircleMarker, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
@@ -13,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { canReplaceLocationText, coordinatesFallback } from "@/lib/location-sync";
 import "leaflet/dist/leaflet.css";
 
@@ -270,7 +272,9 @@ export function MapPicker({
           </button>
         </div>
         <div className="h-64 overflow-hidden rounded-xl border">
-          <MapCanvas value={value} onChange={pinChanged} />
+          <Suspense fallback={<Skeleton height={256} className="w-full" />}>
+            <MapCanvas value={value} onChange={pinChanged} />
+          </Suspense>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -382,16 +386,18 @@ export function MapPicker({
             </button>
           </div>
           <div className="min-h-[16rem] flex-1 overflow-hidden rounded-xl border">
-            <MapCanvas
-              value={draftValue}
-              onChange={(next) => {
-                setDraftValue(next);
-                void reverseGeocode(next)
-                  .then(setDraftText)
-                  .catch(() => undefined);
-              }}
-              zoom={13}
-            />
+            <Suspense fallback={<Skeleton height={256} className="w-full" />}>
+              <MapCanvas
+                value={draftValue}
+                onChange={(next) => {
+                  setDraftValue(next);
+                  void reverseGeocode(next)
+                    .then(setDraftText)
+                    .catch(() => undefined);
+                }}
+                zoom={13}
+              />
+            </Suspense>
           </div>
           <div className="mt-3 flex shrink-0 flex-wrap justify-end gap-2">
             <button
@@ -427,17 +433,19 @@ export function MapPreview({
   const value: [number, number] = [latitude, longitude];
   return (
     <div className="mt-5 h-48 overflow-hidden rounded-xl border">
-      <LeafletMap center={value} zoom={15} scrollWheelZoom={false} className="h-full w-full">
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <CircleMarker
-          center={value}
-          radius={9}
-          pathOptions={{ color: "#087f78", fillColor: "#5ed8ca", fillOpacity: 0.9 }}
-        />
-      </LeafletMap>
+      <Suspense fallback={<Skeleton height={192} className="w-full" />}>
+        <LeafletMap center={value} zoom={15} scrollWheelZoom={false} className="h-full w-full">
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <CircleMarker
+            center={value}
+            radius={9}
+            pathOptions={{ color: "#087f78", fillColor: "#5ed8ca", fillOpacity: 0.9 }}
+          />
+        </LeafletMap>
+      </Suspense>
       <a
         className="sr-only"
         href={`https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=18/${latitude}/${longitude}`}
