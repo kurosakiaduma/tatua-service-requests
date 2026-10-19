@@ -40,7 +40,8 @@ demo users and creates sample requests only when the demo citizen has none.
   Murang'a map pin.
 - Citizen submissions are limited to ten requests per hour to protect service
   capacity and free-tier quotas.
-- Private Supabase Storage uploads restricted to image files up to 5 MB.
+- Private Supabase Storage uploads restricted to JPG, PNG or WebP images up to
+  5 MB.
 - Citizen-only request visibility enforced by server authorization and RLS.
 - Admin dashboard with open/resolved/rejected analytics and status updates,
   plus analytics charts.
@@ -49,7 +50,8 @@ demo users and creates sample requests only when the demo citizen has none.
 - An atomic, append-only status timeline records the time, status, message and
   authenticated administrator for every update. Citizens see the actor as the
   service team.
-- An image lightbox for viewing request photos at full size using signed URLs.
+- An image lightbox for viewing request photos at full size. Uploaded photos use
+  short-lived signed URLs; external image URLs are rendered as-is.
 - An installable web app manifest for adding Tatua to a device home screen.
 - Duplicate reports remain visible as linked reports with a public reference
   such as `TAT-000123`; they follow the original report's status without
@@ -84,6 +86,7 @@ flowchart LR
     App -->|SSR auth session| Supabase[Supabase]
     App -->|RLS-protected queries and RPCs| Database[(Postgres)]
     App -->|Private upload and signed URL| Storage[(Supabase Storage)]
+    App -->|External image URL| External[External image host]
     Database -->|Auth trigger creates profile| Auth[(Supabase Auth)]
     Vercel[Vercel cron] -->|Daily GET /api/health| Health[Health route]
     Health -->|Service-role query| Database
@@ -168,7 +171,10 @@ erDiagram
 `healthcheck` is intentionally independent of the request graph and is queried
 by the daily uptime endpoint. Request images are stored separately in the
 private `request-images` bucket, with the first storage path segment set to the
-citizen UUID and access enforced by Storage RLS policies.
+citizen UUID and access enforced by Storage RLS policies. Citizen uploads always
+use this private bucket. If `image_path` holds an `http(s)://` URL instead, it is
+treated as an external image and displayed directly without signing, which
+supports demo or manually curated records.
 
 Migrations in `supabase/migrations` are the single source of truth. RLS uses
 the `is_admin()` security-definer helper to avoid trusting client-supplied
@@ -183,8 +189,9 @@ Rejected requests require a reason of at least ten characters. Resolved and
 rejected requests are final until an administrator reopens them to in progress
 with a message. Duplicate reports expose only the duplicate explanation, never
 another citizen's private data; linked reports expose their own details and a
-narrow public view of the original. Private images are stored under the submitting
-user's UUID and are served with short-lived signed URLs.
+narrow public view of the original. Uploaded images are stored under the
+submitting user's UUID and served with short-lived signed URLs; external image
+URLs in `image_path` are rendered as-is.
 
 Every request gets a unique `TAT-######` reference. Administrators link an
 unlinked report to an existing primary report through atomic database functions.
@@ -212,8 +219,8 @@ confirmation before replacing it. Enter or **Find on map** geocodes only on
 explicit submit; an empty result leaves the text unchanged. The expanded map
 dialog has Confirm and Cancel so an exploratory pin can be discarded. Request
 photos are resized in the browser to a maximum 1600 pixels on the long edge
-and compressed before upload; the lightbox uses signed URLs and no paid image
-transformations.
+and compressed before upload. The lightbox signs private storage paths and
+renders external image URLs unchanged, with no paid image transformations.
 
 ## Design decisions and limitations
 
@@ -227,8 +234,8 @@ transformations.
   images and timeline. A linked citizen sees only a narrow public view of the
   original — reference, category, location, coordinates, status, created date
   and public timeline — never another citizen's description, image or identity.
-  The service-role key never reaches the browser, and private images are served
-  with short-lived signed URLs.
+  The service-role key never reaches the browser, and uploaded images are served
+  with short-lived signed URLs while external image URLs are rendered as-is.
 - **Free-tier pausing.** Submissions are capped at ten per citizen per rolling
   hour to protect service capacity and free-tier quotas, and a daily Vercel
   cron hits `/api/health` to keep the free Supabase project active.
