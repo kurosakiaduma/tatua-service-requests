@@ -1,23 +1,11 @@
 "use client";
 
 // Citizen report form with synchronized map data and client-side image preparation.
-import { useFormStatus } from "react-dom";
 import { useRef, useState } from "react";
 import { CategoryIcon, categoryConfig } from "@/lib/categories";
 import { categories } from "@/lib/validations";
 import { MapPicker } from "@/app/map";
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      disabled={pending}
-      className="min-h-12 rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
-    >
-      {pending ? "Submitting..." : "Submit request"}
-    </button>
-  );
-}
+import { SubmitButton } from "@/components/ui/submit-button";
 
 /** Collects and submits a validated citizen report with optional media. */
 export function RequestForm({ action }: { action: (formData: FormData) => void }) {
@@ -152,7 +140,7 @@ export function RequestForm({ action }: { action: (formData: FormData) => void }
           className="mt-2 block min-h-12 w-full rounded-lg border bg-background px-3 py-3 text-sm text-foreground"
         />
       </label>
-      <SubmitButton />
+      <SubmitButton label="Submit request" pendingLabel="Submitting…" />
     </form>
   );
 }

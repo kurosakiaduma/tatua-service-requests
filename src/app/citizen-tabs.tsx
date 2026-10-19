@@ -1,7 +1,11 @@
 "use client";
 
 // Citizen workspace tabs for creating reports and reviewing private request history.
-import { useRouter, useSearchParams } from "next/navigation";
+// Tab switches stay on the client via history.pushState so there is no server
+// round trip. The active tab is derived from the URL search params on every
+// render so Nav links, deep links, browser back/forward and post-submit
+// redirects all land on the right tab.
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { FilePlus2, Inbox, Upload } from "lucide-react";
@@ -25,18 +29,33 @@ export function CitizenTabs({
   history: StatusHistory[];
   originalContexts: Record<string, LinkedOriginalContext | null>;
 }) {
-  const router = useRouter();
   const params = useSearchParams();
-  const active =
+  // Derive the active tab from the URL on every render so deep links,
+  // browser back/forward, and the post-submit redirect all land on the
+  // right tab. A local state mirror is kept in sync so that tab clicks
+  // (which use history.pushState) re-render immediately.
+  const urlActive =
     params.get("tab") === "requests" || params.get("created") === "1" ? "requests" : "new";
-  const [selected, setSelected] = useState<RequestWithImage | null>(null);
+  const [active, setActive] = useState(urlActive);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = requests.find((request) => request.id === selectedId) ?? null;
+
+  // Keep the local active tab in sync with the URL (e.g. back/forward navigation).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setActive(urlActive);
+  }, [urlActive]);
+
   useEffect(() => {
     if (params.get("created") === "1")
       toast.success("Request submitted", {
         description: "Your report is now visible in My requests.",
       });
   }, [params]);
-  const select = (tab: string) => router.push(`/dashboard?tab=${tab}`);
+  const select = (tab: string) => {
+    window.history.pushState(null, "", `/dashboard?tab=${tab}`);
+    setActive(tab);
+  };
   return (
     <div className="space-y-5">
       <div
@@ -66,7 +85,7 @@ export function CitizenTabs({
           </span>
         </button>
       </div>
-      {active === "new" ? (
+      {active === "new" && (
         <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
           <div className="mb-6 flex items-center gap-3">
             <div className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground">
@@ -81,7 +100,8 @@ export function CitizenTabs({
           </div>
           <RequestForm action={createRequest} />
         </section>
-      ) : (
+      )}
+      {active === "requests" && (
         <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
           <h2 className="text-xl font-bold text-card-foreground">My requests</h2>
           <p className="mt-1 text-sm text-muted-foreground">{requests.length} submitted</p>
@@ -94,7 +114,7 @@ export function CitizenTabs({
                   <button
                     key={request.id}
                     type="button"
-                    onClick={() => setSelected(request)}
+                    onClick={() => setSelectedId(request.id)}
                     className="cursor-pointer rounded-xl border bg-background p-5 text-left hover:bg-accent/40"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -146,7 +166,7 @@ export function CitizenTabs({
           request={selected}
           history={history}
           original={selected.duplicate_of ? originalContexts[selected.id] : null}
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedId(null)}
         />
       )}
     </div>

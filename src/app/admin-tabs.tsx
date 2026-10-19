@@ -2,13 +2,14 @@
 
 // Administrator workspace for request triage, updates, linking, and activity review.
 import { useEffect, useMemo, useState } from "react";
-import { Activity, BarChart3, Link2, Search, SlidersHorizontal, Unlink } from "lucide-react";
+import { Activity, BarChart3, Link2, Search, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { linkRequest, unlinkRequest, updateRequestStatus } from "@/app/actions";
 import { ImageThumbnail } from "@/app/image-lightbox";
 import { MapPreview } from "@/app/map";
 import { StatusBadge } from "@/app/status-badge";
 import { AdminCharts } from "@/app/charts";
+import { SubmitButton } from "@/components/ui/submit-button";
 import type { ServiceRequest, StatusHistory } from "@/lib/types";
 import { CategoryBadge } from "@/lib/categories";
 
@@ -22,7 +23,8 @@ export function AdminTabs({ requests, history, updated = false }: Props) {
   const [status, setStatus] = useState("all");
   const [category, setCategory] = useState("all");
   const [showLinked, setShowLinked] = useState(false);
-  const [selected, setSelected] = useState<RequestWithImage | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = requests.find((request) => request.id === selectedId) ?? null;
   useEffect(() => {
     if (updated)
       toast.success("Request updated", { description: "The timeline and reports are refreshed." });
@@ -160,7 +162,7 @@ export function AdminTabs({ requests, history, updated = false }: Props) {
                 <button
                   key={request.id}
                   type="button"
-                  onClick={() => setSelected(request)}
+                  onClick={() => setSelectedId(request.id)}
                   className="cursor-pointer grid w-full gap-3 p-5 text-left hover:bg-accent/50 md:grid-cols-[1fr_1.5fr_auto] md:items-center"
                 >
                   <div>
@@ -229,7 +231,7 @@ export function AdminTabs({ requests, history, updated = false }: Props) {
           requests={requests}
           history={history}
           originals={originals}
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedId(null)}
           update={update}
         />
       )}
@@ -345,9 +347,11 @@ function Detail({
               <p className="text-xs text-muted-foreground">
                 Messages on this request are visible to everyone linked to it.
               </p>
-              <button className="min-h-11 rounded-lg bg-primary px-4 font-bold text-primary-foreground">
-                Post update
-              </button>
+              <SubmitButton
+                label="Post update"
+                variant="primary"
+                className="min-h-11 px-4 font-bold"
+              />
             </form>
           </>
         )}
@@ -384,10 +388,12 @@ function Detail({
                     )}
                     <form action={unlinkRequest} className="mt-2">
                       <input type="hidden" name="reportId" value={linked.id} />
-                      <button className="inline-flex items-center gap-1 text-sm font-bold text-destructive">
-                        <Unlink size={15} />
-                        Unlink
-                      </button>
+                      <SubmitButton
+                        label="Unlink"
+                        pendingLabel="Unlinking…"
+                        variant="destructive-outline"
+                        className="inline-flex items-center gap-1 text-sm"
+                      />
                     </form>
                   </div>
                 ))}
@@ -421,9 +427,12 @@ function Detail({
                   placeholder="Optional message"
                   className="min-h-11 w-full rounded-lg border bg-background px-3 py-3 text-foreground"
                 />
-                <button className="min-h-11 rounded-lg bg-primary px-4 font-bold text-primary-foreground">
-                  Link as duplicate
-                </button>
+                <SubmitButton
+                  label="Link as duplicate"
+                  pendingLabel="Linking…"
+                  variant="primary"
+                  className="min-h-11 px-4 font-bold"
+                />
               </form>
             </div>
           </section>
