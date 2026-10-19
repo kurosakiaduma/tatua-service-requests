@@ -1,4 +1,6 @@
 // Reusable loading skeleton that matches the app's muted token and pulses softly.
+// Height and width are applied through inline styles because Tailwind only
+// generates classes that appear as complete strings in the source.
 import type { ReactNode } from "react";
 
 interface SkeletonProps {
@@ -9,17 +11,11 @@ interface SkeletonProps {
 }
 
 /** Renders a fixed-height pulse skeleton that reserves space for pending content. */
-export function Skeleton({ className = "", height, width = "full", children }: SkeletonProps) {
+export function Skeleton({ className = "", height, width, children }: SkeletonProps) {
   return (
     <div
-      className={[
-        "animate-pulse rounded-xl border bg-muted",
-        height ? `h-[${typeof height === "number" ? `${height}px` : height}]` : "h-8",
-        width === "full" ? "w-full" : `w-[${typeof width === "number" ? `${width}px` : width}]`,
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={["animate-pulse rounded-xl border bg-muted", className].filter(Boolean).join(" ")}
+      style={{ height, width }}
       aria-hidden="true"
     >
       {children}

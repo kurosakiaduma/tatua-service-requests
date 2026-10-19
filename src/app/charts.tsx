@@ -8,7 +8,14 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+const Plot260 = dynamic(() => import("react-plotly.js"), {
+  ssr: false,
+  loading: () => <Skeleton height={260} className="w-full" />,
+});
+const Plot280 = dynamic(() => import("react-plotly.js"), {
+  ssr: false,
+  loading: () => <Skeleton height={280} className="w-full" />,
+});
 const FALLBACK_COLORS = {
   text: "#102a2e",
   grid: "#cbdad8",
@@ -103,60 +110,54 @@ export function AdminCharts({
         title="Primary request outcomes"
         summary={`${open} open, ${resolved} resolved and ${rejected} rejected primary requests.`}
       >
-        <Suspense fallback={<Skeleton height={260} className="w-full" />}>
-          <Plot
-            data={[
-              {
-                values: [open, resolved, rejected],
-                labels: ["Open", "Resolved", "Rejected"],
-                type: "pie",
-                hole: 0.62,
-                marker: { colors: [colors.warning, colors.success, colors.danger] },
-                textinfo: "label+value",
-                hovertemplate: "%{label}: %{value}<extra></extra>",
-              },
-            ]}
-            layout={{ ...layout, showlegend: false }}
-            config={{ responsive: true, displayModeBar: false }}
-            style={{ width: "100%", height: "260px" }}
-          />
-        </Suspense>
+        <Plot260
+          data={[
+            {
+              values: [open, resolved, rejected],
+              labels: ["Open", "Resolved", "Rejected"],
+              type: "pie",
+              hole: 0.62,
+              marker: { colors: [colors.warning, colors.success, colors.danger] },
+              textinfo: "label+value",
+              hovertemplate: "%{label}: %{value}<extra></extra>",
+            },
+          ]}
+          layout={{ ...layout, showlegend: false }}
+          config={{ responsive: true, displayModeBar: false }}
+          style={{ width: "100%", height: "260px" }}
+        />
       </Chart>
       <Chart
         title="Most reported issues"
         summary={`${categories.map((category, index) => `${category}: ${categoryCounts[index]}`).join(", ")}.`}
       >
-        <Suspense fallback={<Skeleton height={260} className="w-full" />}>
-          <Plot
-            data={[
-              {
-                x: categories,
-                y: categoryCounts,
-                type: "bar",
-                marker: { color: colors.primary },
-                text: categoryCounts.map(String),
-                textposition: "auto",
-              },
-            ]}
-            layout={{ ...layout, yaxis: { ...layout.yaxis, dtick: 1 } }}
-            config={{ responsive: true, displayModeBar: false }}
-            style={{ width: "100%", height: "260px" }}
-          />
-        </Suspense>
+        <Plot260
+          data={[
+            {
+              x: categories,
+              y: categoryCounts,
+              type: "bar",
+              marker: { color: colors.primary },
+              text: categoryCounts.map(String),
+              textposition: "auto",
+            },
+          ]}
+          layout={{ ...layout, yaxis: { ...layout.yaxis, dtick: 1 } }}
+          config={{ responsive: true, displayModeBar: false }}
+          style={{ width: "100%", height: "260px" }}
+        />
       </Chart>
       <div className="xl:col-span-2">
         <Chart
           title="Primary requests over the last 14 days"
           summary="A status split line chart for recent primary submissions."
         >
-          <Suspense fallback={<Skeleton height={280} className="w-full" />}>
-            <Plot
-              data={traces}
-              layout={layout}
-              config={{ responsive: true, displayModeBar: false }}
-              style={{ width: "100%", height: "280px" }}
-            />
-          </Suspense>
+          <Plot280
+            data={traces}
+            layout={layout}
+            config={{ responsive: true, displayModeBar: false }}
+            style={{ width: "100%", height: "280px" }}
+          />
         </Chart>
       </div>
     </div>

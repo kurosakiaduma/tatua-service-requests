@@ -295,6 +295,10 @@ npm run build
 
 GitHub Actions runs all four checks on every push and pull request.
 
+## License
+
+This project is licensed under the [MIT License](./LICENSE) (2026, Tevin Aduma).
+
 ## Deployment
 
 The repository is designed for Vercel Hobby with the existing Supabase project:

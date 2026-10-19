@@ -1,7 +1,11 @@
 "use client";
 
 // Citizen workspace tabs for creating reports and reviewing private request history.
-// Tab switches stay on the client (history.pushState) so there is no server round trip.
+// Tab switches stay on the client via history.pushState so there is no server
+// round trip. The active tab is derived from the URL search params on every
+// render so Nav links, deep links, browser back/forward and post-submit
+// redirects all land on the right tab.
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -27,7 +31,9 @@ export function CitizenTabs({
   originalContexts: Record<string, LinkedOriginalContext | null>;
 }) {
   const params = useSearchParams();
-  const initialActive =
+  // Derive the active tab from the URL on every render. Nav links and
+  // history.pushState update the URL; this component simply reads it.
+  const active =
     params.get("tab") === "requests" || params.get("created") === "1" ? "requests" : "new";
   const [active, setActive] = useState(initialActive);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -39,24 +45,9 @@ export function CitizenTabs({
         description: "Your report is now visible in My requests.",
       });
   }, [params]);
-
-  // Keep back/forward navigation in sync with the ?tab= URL without a server round trip.
-  useEffect(() => {
-    const onPopState = () => {
-      const current = new URLSearchParams(window.location.search);
-      setActive(
-        current.get("tab") === "requests" || current.get("created") === "1" ? "requests" : "new",
-      );
-    };
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, []);
-
   const select = (tab: string) => {
     window.history.pushState(null, "", `/dashboard?tab=${tab}`);
-    setActive(tab === "requests" ? "requests" : "new");
   };
-
   return (
     <div className="space-y-5">
       <div

@@ -7,10 +7,7 @@ import { Menu, Shield, UserRound, X } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "@/app/actions";
 import { ThemeToggle } from "@/app/theme-toggle";
-import { LinkPendingIndicator } from "@/components/ui/link-pending";
 import { SubmitButton } from "@/components/ui/submit-button";
-
-type NavLink = { href: string; label: string; tab?: "new" | "requests" };
 
 /** Renders navigation appropriate to the current user's role. */
 export function Nav({
@@ -69,7 +66,12 @@ export function Nav({
                 {role ?? "citizen"} account
               </p>
               <form action={signOut}>
-                <SubmitButton label="Sign out" className="w-full text-left" />
+                <SubmitButton
+                  label="Sign out"
+                  pendingLabel="Signing out…"
+                  variant="secondary"
+                  className="min-h-11 w-full px-3 text-left text-sm"
+                />
               </form>
             </div>
           </details>
@@ -120,7 +122,12 @@ export function Nav({
             <ThemeToggle />
           </div>
           <form action={signOut} className="mt-4">
-            <SubmitButton label="Sign out" className="w-full text-left" />
+            <SubmitButton
+              label="Sign out"
+              pendingLabel="Signing out…"
+              variant="secondary"
+              className="w-full rounded-xl text-left px-4"
+            />
           </form>
         </div>
       )}

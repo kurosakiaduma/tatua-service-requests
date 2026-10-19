@@ -1,20 +1,29 @@
+// Client error fallback for unexpected runtime errors, with a reset button.
 "use client";
 
-// Client error fallback for unexpected runtime errors, with a reset button.
 import { useEffect } from "react";
+import Link from "next/link";
+
+const FRIENDLY_MESSAGE = "Something went wrong. Please try again.";
 
 // Renders an accessible error boundary fallback with a reset button.
-export default function Error({ error, reset }: { error: unknown; reset: () => void }) {
+// The component is named ErrorPage to avoid shadowing the global Error.
+export default function ErrorPage({ error, reset }: { error: unknown; reset: () => void }) {
   useEffect(() => {
     console.error("Tatua error boundary caught:", error);
   }, [error]);
 
-  const message = error instanceof Error ? (error as Error).message : String(error);
+  const digest =
+    error instanceof Error && "digest" in error ? (error as { digest?: string }).digest : undefined;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6">
-      <h1 className="text-2xl font-bold text-destructive">Something went wrong</h1>
-      <p className="text-muted-foreground">{message}</p>
+      <h1 className="text-2xl font-bold text-destructive">{FRIENDLY_MESSAGE}</h1>
+      {digest && (
+        <p className="text-xs text-muted-foreground">
+          Reference: <span className="font-mono">{digest}</span>
+        </p>
+      )}
       <button
         type="button"
         onClick={reset}
@@ -22,6 +31,11 @@ export default function Error({ error, reset }: { error: unknown; reset: () => v
       >
         Try again
       </button>
+      <p className="mt-4 text-sm">
+        <Link href="/" className="text-primary hover:underline">
+          Go back home
+        </Link>
+      </p>
     </div>
   );
 }

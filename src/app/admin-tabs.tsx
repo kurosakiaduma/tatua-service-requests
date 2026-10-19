@@ -349,8 +349,8 @@ function Detail({
               </p>
               <SubmitButton
                 label="Post update"
-                pendingLabel="Posting update…"
-                className="min-h-11 rounded-lg bg-primary px-4 font-bold text-primary-foreground"
+                variant="primary"
+                className="min-h-11 px-4 font-bold"
               />
             </form>
           </>
@@ -390,8 +390,9 @@ function Detail({
                       <input type="hidden" name="reportId" value={linked.id} />
                       <SubmitButton
                         label="Unlink"
-                        pendingLabel="Posting update…"
-                        className="min-h-11 inline-flex items-center gap-1 rounded-lg border border-destructive bg-transparent px-3 font-bold text-destructive hover:bg-destructive/10"
+                        pendingLabel="Unlinking…"
+                        variant="destructive-outline"
+                        className="inline-flex items-center gap-1 text-sm"
                       />
                     </form>
                   </div>
@@ -428,8 +429,9 @@ function Detail({
                 />
                 <SubmitButton
                   label="Link as duplicate"
-                  pendingLabel="Posting update…"
-                  className="min-h-11 rounded-lg bg-primary px-4 font-bold text-primary-foreground"
+                  pendingLabel="Linking…"
+                  variant="primary"
+                  className="min-h-11 px-4 font-bold"
                 />
               </form>
             </div>
