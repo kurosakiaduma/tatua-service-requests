@@ -1,7 +1,11 @@
 "use client";
 
 // Citizen workspace tabs for creating reports and reviewing private request history.
-import { useRouter, useSearchParams } from "next/navigation";
+// Tab switches stay on the client via history.pushState so there is no server
+// round trip. The active tab is derived from the URL search params on every
+// render so Nav links, deep links, browser back/forward and post-submit
+// redirects all land on the right tab.
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { FilePlus2, Inbox, Upload } from "lucide-react";
@@ -25,8 +29,9 @@ export function CitizenTabs({
   history: StatusHistory[];
   originalContexts: Record<string, LinkedOriginalContext | null>;
 }) {
-  const router = useRouter();
   const params = useSearchParams();
+  // Derive the active tab from the URL on every render. Nav links and
+  // history.pushState update the URL; this component simply reads it.
   const active =
     params.get("tab") === "requests" || params.get("created") === "1" ? "requests" : "new";
   const [selected, setSelected] = useState<RequestWithImage | null>(null);
@@ -36,7 +41,9 @@ export function CitizenTabs({
         description: "Your report is now visible in My requests.",
       });
   }, [params]);
-  const select = (tab: string) => router.push(`/dashboard?tab=${tab}`);
+  const select = (tab: string) => {
+    window.history.pushState(null, "", `/dashboard?tab=${tab}`);
+  };
   return (
     <div className="space-y-5">
       <div
