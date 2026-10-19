@@ -59,9 +59,13 @@ export default async function Admin({
       .limit(100),
   ]);
   // The bucket is private; URLs are short-lived and generated per authorized admin view.
+  // External URLs (e.g. pasted into Supabase directly) are used as-is.
   const requestsWithImages = await Promise.all(
     (requests ?? []).map(async (request) => {
       if (!request.image_path) return { ...request, image_url: null };
+      if (/^https?:\/\//i.test(request.image_path)) {
+        return { ...request, image_url: request.image_path };
+      }
       const { data } = await supabase.storage
         .from("request-images")
         .createSignedUrl(request.image_path, 3600);

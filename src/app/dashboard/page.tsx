@@ -37,9 +37,13 @@ export default async function Dashboard({
     supabase.from("status_history").select("*").order("created_at", { ascending: true }),
   ]);
   // Signed URLs keep request images private while allowing the dashboard to display them.
+  // External URLs (e.g. pasted into Supabase directly) are used as-is.
   const requestsWithImages = await Promise.all(
     (requests ?? []).map(async (request) => {
       if (!request.image_path) return { ...request, image_url: null };
+      if (/^https?:\/\//i.test(request.image_path)) {
+        return { ...request, image_url: request.image_path };
+      }
       const { data } = await supabase.storage
         .from("request-images")
         .createSignedUrl(request.image_path, 3600);
