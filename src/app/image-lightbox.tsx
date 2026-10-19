@@ -3,7 +3,7 @@
 // Private request-image thumbnail and keyboard-navigable lightbox.
 import { useState } from "react";
 import Image from "next/image";
-import { Maximize2 } from "lucide-react";
+import { Maximize2, X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -45,7 +45,7 @@ export function ImageThumbnail({
         <button
           type="button"
           aria-label={`Open image for ${item.reference}`}
-          className={`group relative block size-24 overflow-hidden rounded-xl border bg-muted ${className}`}
+          className={`group relative block size-24 cursor-pointer overflow-hidden rounded-xl border bg-muted ${className}`}
         >
           {!loaded && (
             <span className="absolute inset-0 animate-pulse bg-muted" aria-hidden="true" />
@@ -64,8 +64,17 @@ export function ImageThumbnail({
           </span>
         </button>
       </DialogTrigger>
-      <DialogContent className="relative z-50 flex max-h-[95vh] max-w-6xl flex-col items-center bg-foreground/95 p-4 text-background">
-        <DialogClose className="absolute right-4 top-4 bg-foreground/20 rounded-full p-2 text-background hover:bg-foreground/40" />
+      <DialogContent
+        showClose={false}
+        zIndex={1100}
+        className="flex max-h-[95vh] max-w-6xl flex-col items-center bg-foreground/95 p-4 text-background"
+      >
+        <DialogClose
+          aria-label="Close image"
+          className="absolute right-4 top-4 z-10 grid size-10 cursor-pointer place-items-center rounded-full bg-background/20 text-background transition hover:bg-background/40"
+        >
+          <X size={18} />
+        </DialogClose>
         <DialogTitle className="sr-only">Image for {item.reference}</DialogTitle>
         <DialogDescription className="sr-only">{item.alt}</DialogDescription>
         <div
@@ -99,7 +108,7 @@ export function ImageThumbnail({
                 type="button"
                 key={candidate.url}
                 onClick={() => setIndex(candidateIndex)}
-                className="size-12 overflow-hidden rounded border"
+                className="size-12 cursor-pointer overflow-hidden rounded border"
               >
                 <Image
                   src={candidate.url}
