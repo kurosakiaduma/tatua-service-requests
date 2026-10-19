@@ -437,7 +437,7 @@ export function MapPreview({
   if (latitude === null || longitude === null) return null;
   const value: [number, number] = [latitude, longitude];
   return (
-    <div className="mt-5 h-48 overflow-hidden rounded-xl border">
+    <div className="mt-5 h-48 shrink-0 overflow-hidden rounded-xl border">
       <LeafletMap192 center={value} zoom={15} scrollWheelZoom={false} className="h-full w-full">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

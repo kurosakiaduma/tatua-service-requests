@@ -45,7 +45,7 @@ export function ImageThumbnail({
         <button
           type="button"
           aria-label={`Open image for ${item.reference}`}
-          className={`group relative block size-24 cursor-pointer overflow-hidden rounded-xl border bg-muted ${className}`}
+          className={`group relative block size-24 shrink-0 cursor-pointer overflow-hidden rounded-xl border bg-muted ${className}`}
         >
           {!loaded && (
             <span className="absolute inset-0 animate-pulse bg-muted" aria-hidden="true" />
@@ -78,7 +78,7 @@ export function ImageThumbnail({
         <DialogTitle className="sr-only">Image for {item.reference}</DialogTitle>
         <DialogDescription className="sr-only">{item.alt}</DialogDescription>
         <div
-          className="relative flex max-w-full items-center justify-center"
+          className="relative flex max-w-full shrink-0 items-center justify-center"
           autoFocus
           onKeyDown={(event) => {
             if (event.key === "ArrowRight") setIndex((value) => (value + 1) % items.length);
@@ -102,7 +102,7 @@ export function ImageThumbnail({
           {items.length > 1 ? ` · ${index + 1} of ${items.length}` : ""}
         </p>
         {items.length > 1 && (
-          <div className="mt-2 flex gap-2">
+          <div className="mt-2 flex shrink-0 gap-2">
             {items.map((candidate, candidateIndex) => (
               <button
                 type="button"
