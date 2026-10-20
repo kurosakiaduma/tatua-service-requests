@@ -44,8 +44,11 @@ export function RequestForm({ action }: { action: (formData: FormData) => void }
       action={action}
       className="space-y-5"
       onSubmit={(event) => {
+        // Capture the form before the async compression; React clears
+        // event.currentTarget once the submit handler returns.
+        const form = event.currentTarget;
         if (compressing.current) return;
-        const input = event.currentTarget.elements.namedItem("image") as HTMLInputElement | null;
+        const input = form.elements.namedItem("image") as HTMLInputElement | null;
         const image = input?.files?.[0];
         if (image && !["image/jpeg", "image/png", "image/webp"].includes(image.type)) {
           event.preventDefault();
@@ -64,10 +67,11 @@ export function RequestForm({ action }: { action: (formData: FormData) => void }
                 input.files = transfer.files;
                 compressed.current = true;
                 compressing.current = false;
-                event.currentTarget.requestSubmit();
+                form.requestSubmit();
               })
               .catch(() => {
                 compressing.current = false;
+                selectedFile.current = null;
                 input?.setCustomValidity(
                   "We could not process that image. Please choose another file.",
                 );
